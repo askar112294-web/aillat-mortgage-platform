@@ -18,11 +18,11 @@ function getMinPriceForPartner(partnerId: string, projects: PropertyProject[]): 
       // published
       (!('isDraft' in p) || !p.isDraft) &&
       p.partnerId === partnerId &&
-      typeof p.minPrice === 'number'
+      typeof p.priceFrom === 'number'
   )
 
   if (!filtered.length) return null
-  return Math.min(...filtered.map((p) => p.minPrice!))
+  return Math.min(...filtered.map((p) => p.priceFrom!))
 }
 
 export default function PartnersSection({
@@ -84,7 +84,7 @@ export default function PartnersSection({
         >
           {partners.map((partner) => {
             const projectCount = countPartnerProjects(partner.id, projects)
-            const minPrice = getMinPriceForPartner(partner.id, projects)
+            const priceFrom = getMinPriceForPartner(partner.id, projects)
             const isActive = activePartnerId === partner.id
             const hasProjects = projectCount > 0
 
@@ -181,12 +181,12 @@ export default function PartnersSection({
                     {hasProjects ? (
                       <>
                         {projectCount} ЖК
-                        {minPrice && (
+                        {priceFrom && (
                           <>
                             {'\u00A0'}·{'\u00A0'}
                             <span style={{ color: '#4681F4', fontWeight: 500 }}>
                               от&nbsp;
-                              {minPrice.toLocaleString('ru-RU', {
+                              {priceFrom.toLocaleString('ru-RU', {
                                 style: 'currency',
                                 currency: 'RUB',
                                 maximumFractionDigits: 0

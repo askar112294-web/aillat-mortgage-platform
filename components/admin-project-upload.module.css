@@ -1,0 +1,111 @@
+.imageManager {
+  padding: 18px 18px 0;
+}
+
+.cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #f5f5f7;
+}
+
+.coverImage {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #24493d, #8d9970);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #1d1d1f;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.actions {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.uploadButton {
+  min-height: 40px;
+  padding: 0 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid #d2d2d7;
+  background: #fff;
+  color: #1d1d1f;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.uploadButton:hover {
+  background: #f5f5f7;
+  border-color: #b9b9bd;
+}
+
+.uploadButtonDisabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.fileInput {
+  display: none;
+}
+
+.removeButton {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: #d14343;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hint {
+  width: 100%;
+  color: #86868b;
+  font-size: 11px;
+}
+
+.error {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff2f2;
+  color: #b42318;
+  font-size: 12px;
+}

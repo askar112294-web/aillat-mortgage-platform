@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Application, Partner, ProductConfig, PropertyProject } from '@/lib/types'
 import { DEFAULT_PRODUCT, formatKzt } from '@/lib/mortgage'
+import uploadStyles from './admin-project-upload.module.css'
 
 type Tab = 'overview' | 'product' | 'partners' | 'projects' | 'applications'
 type Content = { product: ProductConfig; partners: Partner[]; projects: PropertyProject[] }
@@ -24,6 +25,8 @@ export default function AdminPanel() {
   const [apps, setApps] = useState<Application[]>([])
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [uploadingProjectId, setUploadingProjectId] = useState<string | null>(null)
+  const [uploadErrors, setUploadErrors] = useState<Record<string, string>>({})
 
   const load = async () => {
     const [c, a] = await Promise.all([
@@ -71,6 +74,36 @@ export default function AdminPanel() {
       accent: 'lime', description: '', coverImageUrl: '', gallery: [], active: true,
     }],
   }))
+
+  const uploadProjectCover = async (projectId: string, file: File) => {
+    setUploadingProjectId(projectId)
+    setUploadErrors((current) => ({ ...current, [projectId]: '' }))
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch('/api/uploads/projects', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка загрузки изображения')
+      }
+
+      updateProject(projectId, { coverImageUrl: data.url }, setContent)
+    } catch (error) {
+      setUploadErrors((current) => ({
+        ...current,
+        [projectId]: error instanceof Error ? error.message : 'Ошибка загрузки изображения',
+      }))
+    } finally {
+      setUploadingProjectId(null)
+    }
+  }
 
   const setStatus = async (id: string, status: Application['status']) => {
     await fetch('/api/applications', {
@@ -203,7 +236,70 @@ export default function AdminPanel() {
             <div className="admin-project-grid">
               {content.projects.map((project) => (
                 <div className="admin-project-card" key={project.id}>
-                  <div className={`admin-project-cover project-${project.accent}`}><span>{project.badge}</span><strong>{project.name}</strong><div/><i/></div>
+                  <div className={uploadStyles.imageManager}>
+                    <div className={uploadStyles.cover}>
+                      {project.coverImageUrl?.trim() ? (
+                        <img
+                          className={uploadStyles.coverImage}
+                          src={project.coverImageUrl}
+                          alt={project.name}
+                        />
+                      ) : (
+                        <div className={uploadStyles.placeholder}>
+                          <span>Фото отсутствует</span>
+                        </div>
+                      )}
+
+                      {project.badge ? (
+                        <span className={uploadStyles.badge}>{project.badge}</span>
+                      ) : null}
+                    </div>
+
+                    <div className={uploadStyles.actions}>
+                      <label
+                        className={`${uploadStyles.uploadButton} ${
+                          uploadingProjectId === project.id ? uploadStyles.uploadButtonDisabled : ''
+                        }`}
+                      >
+                        {uploadingProjectId === project.id
+                          ? 'Загрузка...'
+                          : project.coverImageUrl
+                            ? 'Заменить фото'
+                            : 'Загрузить фото'}
+
+                        <input
+                          className={uploadStyles.fileInput}
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          disabled={uploadingProjectId === project.id}
+                          onChange={(event) => {
+                            const file = event.target.files?.[0]
+                            if (file) uploadProjectCover(project.id, file)
+                            event.target.value = ''
+                          }}
+                        />
+                      </label>
+
+                      {project.coverImageUrl ? (
+                        <button
+                          type="button"
+                          className={uploadStyles.removeButton}
+                          onClick={() => updateProject(project.id, { coverImageUrl: '' }, setContent)}
+                        >
+                          Удалить
+                        </button>
+                      ) : null}
+
+                      <small className={uploadStyles.hint}>
+                        JPG, PNG или WebP · до 5 МБ · рекомендуется 16:9
+                      </small>
+                    </div>
+
+                    {uploadErrors[project.id] ? (
+                      <div className={uploadStyles.error}>{uploadErrors[project.id]}</div>
+                    ) : null}
+                  </div>
+
                   <div className="admin-project-form">
                     <Field label="Название ЖК" value={project.name} onChange={(v) => updateProject(project.id, { name: v }, setContent)}/>
                     <SelectField label="Застройщик" value={project.partnerId} options={content.partners.map((x) => ({ value: x.id, label: x.name }))} onChange={(v) => updateProject(project.id, { partnerId: v }, setContent)}/>
@@ -213,6 +309,7 @@ export default function AdminPanel() {
                     <Field label="Бейдж" value={project.badge} onChange={(v) => updateProject(project.id, { badge: v }, setContent)}/>
                     <TextArea label="Описание" value={project.description} onChange={(v) => updateProject(project.id, { description: v }, setContent)}/>
                   </div>
+
                   <div className="admin-project-footer"><label><span>Публикация</span><div className="admin-switch"><input type="checkbox" checked={project.active} onChange={(e) => updateProject(project.id, { active: e.target.checked }, setContent)}/><i/></div></label><button className="admin-trash" onClick={() => setContent((c) => ({ ...c, projects: c.projects.filter((x) => x.id !== project.id) }))}>Удалить ЖК</button></div>
                 </div>
               ))}
@@ -234,16 +331,39 @@ export default function AdminPanel() {
 function updatePartner(id: string, patch: Partial<Partner>, setter: React.Dispatch<React.SetStateAction<Content>>) {
   setter((c) => ({ ...c, partners: c.partners.map((item) => item.id === id ? { ...item, ...patch } : item) }))
 }
+
 function updateProject(id: string, patch: Partial<PropertyProject>, setter: React.Dispatch<React.SetStateAction<Content>>) {
   setter((c) => ({ ...c, projects: c.projects.map((item) => item.id === id ? { ...item, ...patch } : item) }))
 }
-function shortMoney(value: number) { return value >= 1_000_000 ? `${(value / 1_000_000).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} млн ₸` : formatKzt(value) }
-function Metric({ label, value, note, tone }: { label: string; value: string; note: string; tone: string }) { return <div className={`admin-metric admin-metric-${tone}`}><div className="admin-metric-dot"/><span>{label}</span><strong>{value}</strong><small>{note}</small></div> }
-function PanelHead({ eyebrow, title, subtitle, action }: { eyebrow: string; title: string; subtitle?: string; action?: React.ReactNode }) { return <div className="admin-panel-head"><div><span>{eyebrow}</span><h3>{title}</h3>{subtitle ? <p>{subtitle}</p> : null}</div>{action}</div> }
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) { return <label className="admin-field-new"><span>{label}</span><input value={value} onChange={(e) => onChange(e.target.value)}/></label> }
-function TextArea({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) { return <label className="admin-field-new"><span>{label}</span><textarea rows={3} value={value} onChange={(e) => onChange(e.target.value)}/></label> }
-function NumberField({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) { return <label className="admin-field-new"><span>{label}</span><input inputMode="numeric" value={value.toLocaleString('ru-RU')} onChange={(e) => onChange(inputNum(e.target.value))}/></label> }
-function SelectField({ label, value, options, onChange }: { label: string; value: string; options: { value: string; label: string }[]; onChange: (v: string) => void }) { return <label className="admin-field-new"><span>{label}</span><select value={value} onChange={(e) => onChange(e.target.value)}>{options.map((o) => <option value={o.value} key={o.value}>{o.label}</option>)}</select></label> }
+
+function shortMoney(value: number) {
+  return value >= 1_000_000 ? `${(value / 1_000_000).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} млн ₸` : formatKzt(value)
+}
+
+function Metric({ label, value, note, tone }: { label: string; value: string; note: string; tone: string }) {
+  return <div className={`admin-metric admin-metric-${tone}`}><div className="admin-metric-dot"/><span>{label}</span><strong>{value}</strong><small>{note}</small></div>
+}
+
+function PanelHead({ eyebrow, title, subtitle, action }: { eyebrow: string; title: string; subtitle?: string; action?: React.ReactNode }) {
+  return <div className="admin-panel-head"><div><span>{eyebrow}</span><h3>{title}</h3>{subtitle ? <p>{subtitle}</p> : null}</div>{action}</div>
+}
+
+function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return <label className="admin-field-new"><span>{label}</span><input value={value} onChange={(e) => onChange(e.target.value)}/></label>
+}
+
+function TextArea({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return <label className="admin-field-new"><span>{label}</span><textarea rows={3} value={value} onChange={(e) => onChange(e.target.value)}/></label>
+}
+
+function NumberField({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
+  return <label className="admin-field-new"><span>{label}</span><input inputMode="numeric" value={value.toLocaleString('ru-RU')} onChange={(e) => onChange(inputNum(e.target.value))}/></label>
+}
+
+function SelectField({ label, value, options, onChange }: { label: string; value: string; options: { value: string; label: string }[]; onChange: (v: string) => void }) {
+  return <label className="admin-field-new"><span>{label}</span><select value={value} onChange={(e) => onChange(e.target.value)}>{options.map((o) => <option value={o.value} key={o.value}>{o.label}</option>)}</select></label>
+}
+
 function ApplicationTable({ apps, projects, onStatus }: { apps: Application[]; projects: PropertyProject[]; onStatus: (id: string, status: Application['status']) => void }) {
   const label: Record<Application['status'], string> = { new: 'Новая', in_progress: 'В работе', approved: 'Одобрена', rejected: 'Отказ' }
   return <div className="admin-table-wrap"><table className="admin-table-new"><thead><tr><th>Заявка</th><th>Клиент</th><th>Объект</th><th>Финансирование</th><th>Дата</th><th>Статус</th></tr></thead><tbody>{apps.length ? apps.map((app) => <tr key={app.id}><td><strong>{app.id}</strong><span>{app.source === 'project' ? 'из карточки ЖК' : 'из калькулятора'}</span></td><td><strong>{app.iin}</strong><span>{app.phone}</span></td><td><strong>{projects.find((p) => p.id === app.selectedProjectId)?.name || 'Не выбран'}</strong><span>{formatKzt(app.propertyPrice)}</span></td><td><strong>{formatKzt(app.financingAmount)}</strong><span>{app.termMonths} мес. · ПВ {app.downPaymentPercent || Math.round(app.downPayment / app.propertyPrice * 100)}%</span></td><td><strong>{new Date(app.createdAt).toLocaleDateString('ru-RU')}</strong><span>{new Date(app.createdAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</span></td><td><select className={`admin-status admin-status-${app.status}`} value={app.status} onChange={(e) => onStatus(app.id, e.target.value as Application['status'])}>{Object.entries(label).map(([value, text]) => <option value={value} key={value}>{text}</option>)}</select></td></tr>) : <tr><td colSpan={6} className="admin-empty">Заявок пока нет. Отправьте тестовую заявку с клиентской витрины.</td></tr>}</tbody></table></div>
