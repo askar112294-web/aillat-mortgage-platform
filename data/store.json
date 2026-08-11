@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 2,
+  "product": {
+    "heroTitle": "Дом, который становится вашим",
+    "heroDescription": "Исламское финансирование недвижимости с прозрачной структурой сделки. Рассчитайте условия и оставьте заявку онлайн",
+    "productTitle": "Финансирование без классической процентной модели",
+    "productDescription": "Ailat Finance строит продукт на принципах исламского финансирования: клиент заранее понимает структуру сделки, стоимость и график платежей",
+    "minPropertyPrice": 10000000,
+    "maxPropertyPrice": 100000000,
+    "minFinancingAmount": 5000000,
+    "maxFinancingAmount": 50000000,
+    "minDownPaymentPercent": 30,
+    "terms": [
+      12,
+      24,
+      36,
+      48,
+      60
+    ],
+    "annualMarginPercent": 18,
+    "applicationCta": "Получить предварительное решение",
+    "currency": "KZT"
+  },
+  "partners": [
+    {
+      "id": "bi-group",
+      "name": "BI Group",
+      "city": "Астана",
+      "description": "Крупный девелопер жилой и коммерческой недвижимости.",
+      "active": true,
+      "website": "",
+      "logoUrl": ""
+    },
+    {
+      "id": "sensata-group",
+      "name": "Sensata Group",
+      "city": "Астана",
+      "description": "Девелопер современных жилых проектов.",
+      "active": true,
+      "website": "",
+      "logoUrl": ""
+    },
+    {
+      "id": "svoi-dom",
+      "name": "Свой Дом",
+      "city": "Астана",
+      "description": "Жилые проекты доступного формата.",
+      "active": true,
+      "website": "",
+      "logoUrl": ""
+    }
+  ],
+  "projects": [
+    {
+      "id": "greenline",
+      "partnerId": "bi-group",
+      "name": "GreenLine.Headliner",
+      "city": "Астана",
+      "district": "Есильский район",
+      "priceFrom": 32500000,
+      "completion": "Готовое жилье",
+      "badge": "Популярный",
+      "accent": "lime",
+      "description": "Современный жилой квартал рядом с ключевой городской инфраструктурой.",
+      "active": true,
+      "address": "",
+      "priceTo": null,
+      "areaFrom": null,
+      "areaTo": null,
+      "coverImageUrl": "",
+      "gallery": []
+    },
+    {
+      "id": "sensata",
+      "partnerId": "sensata-group",
+      "name": "Grand Turan",
+      "city": "Астана",
+      "district": "Нура район",
+      "priceFrom": 28900000,
+      "completion": "IV квартал 2026",
+      "badge": "Новый проект",
+      "accent": "violet",
+      "description": "Продуманные планировки, закрытый двор и удобный выезд на основные магистрали.",
+      "active": true,
+      "address": "",
+      "priceTo": null,
+      "areaFrom": null,
+      "areaTo": null,
+      "coverImageUrl": "",
+      "gallery": []
+    },
+    {
+      "id": "nova-city",
+      "partnerId": "svoi-dom",
+      "name": "Nova City",
+      "city": "Астана",
+      "district": "Алматы район",
+      "priceFrom": 24700000,
+      "completion": "Готовое жилье",
+      "badge": "От 24,7 млн ₸",
+      "accent": "cyan",
+      "description": "Доступный формат нового жилья с базовой инфраструктурой внутри квартала.",
+      "active": true,
+      "address": "",
+      "priceTo": null,
+      "areaFrom": null,
+      "areaTo": null,
+      "coverImageUrl": "",
+      "gallery": []
+    }
+  ],
+  "applications": [
+    {
+      "iin": "900900900900",
+      "phone": "77087257559",
+      "selectedProjectId": "sensata",
+      "source": "project",
+      "propertyPrice": 28900000,
+      "minDownPayment": 8670000,
+      "downPayment": 13370000,
+      "downPaymentPercent": 46.3,
+      "financingAmount": 15530000,
+      "termMonths": 60,
+      "monthlyPayment": 491783,
+      "totalRepayment": 29507000,
+      "eligible": true,
+      "eligibilityReason": null,
+      "consentAccepted": true,
+      "consentVersion": "2026-08-11-v1",
+      "consentAcceptedAt": "2026-08-11T09:57:25.393Z",
+      "id": "APP-1786442245443",
+      "createdAt": "2026-08-11T09:57:25.443Z",
+      "status": "in_progress",
+      "updatedAt": "2026-08-11T10:12:20.385Z"
+    }
+  ]
+}
