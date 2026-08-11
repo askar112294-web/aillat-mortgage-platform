@@ -39,3 +39,488 @@ button,a{-webkit-tap-highlight-color:transparent}
 @media(max-width:1050px){.apple-conditions-grid{grid-template-columns:1fr}.apple-calculator-card{grid-template-columns:1fr}.apple-project-grid{grid-template-columns:1fr 1fr}.apple-how-grid{grid-template-columns:1fr 1fr}.apple-admin-shell{grid-template-columns:76px 1fr}.apple-admin-sidebar{padding:22px 10px}.admin-logo>span:last-child,.admin-product-name,.apple-admin-sidebar nav button>span:not(.admin-nav-icon),.admin-side-footer{display:none}.admin-logo{justify-content:center}.apple-admin-sidebar nav button{justify-content:center;padding:0}.admin-nav-icon{font-size:15px}.apple-admin-sidebar nav button b{position:absolute;margin:0 0 24px 24px}.apple-admin-main{padding:0 22px 50px}.admin-dashboard-grid,.admin-two-column{grid-template-columns:1fr}.admin-partner-row{grid-template-columns:48px 1fr 1fr}.admin-partner-description{grid-column:2/4}.admin-row-actions{grid-column:1/4;height:auto;border:0;border-top:1px solid #efeff2;padding:12px 0 0;flex-direction:row;align-items:center}.admin-project-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.apple-container{width:calc(100% - 30px)}.apple-header{height:54px}.apple-nav{display:none;position:absolute;top:54px;left:0;right:0;background:rgba(255,255,255,.98);padding:25px 22px;border-bottom:1px solid #eee;flex-direction:column;align-items:flex-start;gap:18px}.apple-nav-open{display:flex}.apple-menu{display:block}.apple-header-actions{margin-left:auto;gap:10px}.apple-hero{padding:72px 0 56px}.apple-hero h1{letter-spacing:-2.5px}.apple-trust-block{padding-bottom:72px}.apple-trust-grid{grid-template-columns:1fr;gap:24px}.apple-conditions-section{padding-top:72px}.apple-calculator-section,.apple-projects-section,.apple-how-section{padding:72px 0}.apple-section-intro{display:block}.apple-section-intro h2{font-size:40px;letter-spacing:-2px}.apple-section-intro>p,.apple-project-intro>p{margin-top:17px}.apple-calc-controls{padding:34px 22px}.apple-calc-summary{padding:36px 24px}.apple-control-label b{font-size:25px}.apple-summary-payment{font-size:43px}.apple-project-grid{grid-template-columns:1fr}.apple-project-visual{height:330px}.apple-partner-rail{justify-content:flex-start}.apple-how-grid{grid-template-columns:1fr}.apple-how-grid>div{min-height:220px}.apple-final-cta{padding:72px 0}.apple-final-inner h2{font-size:50px;letter-spacing:-3px}.apple-footer-grid{grid-template-columns:1fr;gap:35px}.apple-modal{padding:36px 22px}.apple-admin-shell{display:block}.apple-admin-sidebar{position:sticky;top:0;z-index:50;height:58px;padding:8px 14px;flex-direction:row;align-items:center;overflow:auto}.admin-logo{margin-right:12px}.apple-admin-sidebar nav{flex-direction:row}.apple-admin-sidebar nav button{width:38px;min-width:38px}.apple-admin-main{padding:0 14px 45px}.apple-admin-topbar{height:90px}.apple-admin-topbar h1{font-size:25px}.admin-metrics-grid{grid-template-columns:1fr 1fr}.admin-welcome{min-height:250px;flex-direction:column;align-items:flex-start}.admin-field-grid{grid-template-columns:1fr}.admin-partner-row{grid-template-columns:44px 1fr}.admin-partner-fields,.admin-partner-description{grid-column:1/3}.admin-row-actions{grid-column:1/3}.admin-project-grid{grid-template-columns:1fr}}
 @media(max-width:470px){.apple-header .apple-pill-small{height:32px;padding:0 14px;font-size:11px}.apple-hero-actions{flex-direction:column}.apple-hero h1{letter-spacing:-2px}.apple-term-tabs{grid-template-columns:repeat(5,1fr);gap:5px}.apple-term-tabs button{height:58px;font-size:14px}.apple-project-price-row{grid-template-columns:1fr}.apple-modal-summary{grid-template-columns:1fr}.admin-metrics-grid{grid-template-columns:1fr}.admin-top-actions .admin-icon-button{display:none}}
+/* =========================
+   PROJECT CARDS
+========================= */
+
+.catalog-project-card {
+  background: #fff;
+  border: 1px solid #e5e5e7;
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.catalog-project-card:hover {
+  transform: translateY(-4px);
+  border-color: #d2d2d7;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+}
+
+.catalog-project-media {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #f5f5f7;
+}
+
+.catalog-project-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 400ms ease;
+}
+
+.catalog-project-card:hover .catalog-project-image {
+  transform: scale(1.025);
+}
+
+.catalog-project-status {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #1d1d1f;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 600;
+}
+
+.catalog-project-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.catalog-project-top h3 {
+  margin: 0;
+  color: #1d1d1f;
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.catalog-project-developer {
+  margin: 6px 0 0;
+  color: #6e6e73;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.catalog-project-address {
+  margin: 18px 0 0;
+  color: #6e6e73;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.catalog-project-specs {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid #eeeef0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.catalog-project-specs div {
+  min-width: 0;
+}
+
+.catalog-project-specs span {
+  display: block;
+  color: #86868b;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.catalog-project-specs strong {
+  display: block;
+  margin-top: 5px;
+  color: #1d1d1f;
+  font-size: 15px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.catalog-project-specs div:first-child strong {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.catalog-project-payment {
+  margin-top: 24px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: #f3f7f3;
+}
+
+.catalog-project-payment span {
+  display: block;
+  color: #6e6e73;
+  font-size: 13px;
+}
+
+.catalog-project-payment strong {
+  display: block;
+  margin-top: 4px;
+  color: #1d1d1f;
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.catalog-project-payment small {
+  display: block;
+  margin-top: 5px;
+  color: #86868b;
+  font-size: 12px;
+}
+
+.catalog-project-actions {
+  margin-top: auto;
+  padding-top: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.catalog-project-actions .catalog-btn {
+  min-height: 48px;
+  border-radius: 12px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.catalog-project-actions .catalog-btn-secondary {
+  background: #fff;
+  border-color: #d2d2d7;
+  color: #1d1d1f;
+}
+
+.catalog-project-actions .catalog-btn-secondary:hover {
+  background: #f5f5f7;
+}
+
+.catalog-project-actions .catalog-btn-primary {
+  background: #123d32;
+  border-color: #123d32;
+  color: #fff;
+}
+
+.catalog-project-actions .catalog-btn-primary:hover {
+  background: #0c3027;
+  border-color: #0c3027;
+}
+
+@media (max-width: 720px) {
+  .catalog-project-specs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .catalog-project-actions {
+    grid-template-columns: 1fr;
+  }
+}
+/* =========================================================
+   PROJECTS CATALOG
+========================================================= */
+
+.catalog-projects-section {
+  padding: 110px 0 120px;
+  background: #ffffff;
+  scroll-margin-top: 90px;
+}
+
+/* ---------- Header ---------- */
+
+.catalog-section-head {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(320px, 1.2fr);
+  gap: 48px;
+  align-items: end;
+  margin-bottom: 36px;
+}
+
+.catalog-section-head h2 {
+  margin: 8px 0 0;
+  color: #1d1d1f;
+  font-size: clamp(34px, 4vw, 48px);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.catalog-section-head > p {
+  max-width: 680px;
+  margin: 0;
+  color: #6e6e73;
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+/* ---------- Filters ---------- */
+
+.catalog-filters {
+  display: grid;
+  grid-template-columns:
+    minmax(180px, 1fr)
+    minmax(180px, 1fr)
+    minmax(180px, 1fr)
+    minmax(180px, 1fr)
+    auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 32px;
+}
+
+.catalog-filter-group {
+  min-width: 0;
+}
+
+.catalog-filter-label {
+  display: block;
+  margin: 0 0 8px 2px;
+  color: #86868b;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.catalog-filter-group select {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 44px 0 17px;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  border: 1px solid #d2d2d7;
+  border-radius: 14px;
+
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #6e6e73 50%),
+    linear-gradient(135deg, #6e6e73 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) 23px,
+    calc(100% - 15px) 23px;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+
+  color: #1d1d1f;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  outline: none;
+
+  cursor: pointer;
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.catalog-filter-group select:hover {
+  border-color: #aeb0b4;
+}
+
+.catalog-filter-group select:focus {
+  border-color: #194d3e;
+  box-shadow: 0 0 0 3px rgba(25, 77, 62, 0.1);
+}
+
+.catalog-filter-reset {
+  min-height: 54px;
+  padding: 0 12px;
+
+  border: 0;
+  background: transparent;
+
+  color: #194d3e;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+/* ---------- Projects grid ---------- */
+
+.catalog-projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+
+.catalog-projects-grid > * {
+  min-width: 0;
+}
+
+/* ---------- Empty state ---------- */
+
+.catalog-empty {
+  padding: 72px 24px;
+  border: 1px solid #e5e5e7;
+  border-radius: 24px;
+  background: #fafafa;
+  text-align: center;
+}
+
+.catalog-empty h3 {
+  margin: 0;
+  color: #1d1d1f;
+  font-size: 26px;
+  letter-spacing: -0.025em;
+}
+
+.catalog-empty p {
+  max-width: 480px;
+  margin: 12px auto 24px;
+  color: #6e6e73;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   PROJECT CARD — SIZE CORRECTIONS
+========================================================= */
+
+.catalog-project-card {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+.catalog-project-media {
+  aspect-ratio: 16 / 9;
+  min-height: 0;
+}
+
+.catalog-project-body {
+  padding: 22px;
+}
+
+.catalog-project-top h3 {
+  font-size: 22px;
+}
+
+.catalog-project-specs {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.catalog-project-specs strong {
+  overflow-wrap: anywhere;
+}
+
+.catalog-project-payment {
+  margin-top: 20px;
+}
+
+.catalog-project-actions {
+  padding-top: 20px;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+  .catalog-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .catalog-filter-reset {
+    justify-self: start;
+  }
+
+  .catalog-projects-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 720px) {
+  .catalog-projects-section {
+    padding: 72px 0 80px;
+  }
+
+  .catalog-section-head {
+    display: block;
+    margin-bottom: 28px;
+  }
+
+  .catalog-section-head h2 {
+    font-size: 34px;
+  }
+
+  .catalog-section-head > p {
+    margin-top: 14px;
+    font-size: 15px;
+  }
+
+  .catalog-filters {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .catalog-filter-reset {
+    min-height: auto;
+    padding: 4px 0;
+  }
+
+  .catalog-projects-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .catalog-project-body {
+    padding: 20px;
+  }
+
+  .catalog-project-specs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .catalog-project-actions {
+    grid-template-columns: 1fr;
+  }
+}
