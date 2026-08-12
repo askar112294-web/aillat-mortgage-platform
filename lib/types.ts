@@ -31,6 +31,19 @@ export type Partner = {
 
 export type ConstructionStatus = 'ready' | 'building' | 'planned'
 
+export type ProjectAttribute = {
+  id: string
+  label: string
+  value: string
+}
+
+export type ProjectFeature = {
+  id: string
+  icon: string
+  title: string
+  description?: string
+}
+
 export type PropertyProject = {
   id: string
   slug?: string
@@ -55,6 +68,14 @@ export type PropertyProject = {
   coverImageUrl?: string
   gallery?: string[]
   projectUrl?: string
+
+  housingClass?: string
+  buildingType?: string
+  floors?: number
+  ceilingHeight?: number
+  attributes?: ProjectAttribute[]
+  features?: ProjectFeature[]
+
   active: boolean
   createdAt?: string
   updatedAt?: string

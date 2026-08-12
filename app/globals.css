@@ -524,3 +524,500 @@ button,a{-webkit-tap-highlight-color:transparent}
     grid-template-columns: 1fr;
   }
 }
+/* =========================================================
+   PROJECT DETAIL PAGE
+========================================================= */
+
+.project-page {
+  min-height: 100vh;
+  background: #fff;
+  color: #1d1d1f;
+}
+
+.project-header-back {
+  color: #6e6e73;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.project-header-back:hover {
+  color: #1d1d1f;
+}
+
+/* HERO */
+
+.project-hero {
+  padding-top: 42px;
+}
+
+.project-hero-media {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 30px;
+  background: #f5f5f7;
+  aspect-ratio: 16 / 7.5;
+}
+
+.project-hero-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.project-hero-badges {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.project-hero-badges span {
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #1d1d1f;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.project-hero-info {
+  padding: 38px 4px 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.project-hero-copy h1 {
+  max-width: 760px;
+  margin: 10px 0 0;
+  font-size: clamp(46px, 6vw, 78px);
+  line-height: 0.98;
+  font-weight: 700;
+  letter-spacing: -0.055em;
+}
+
+.project-hero-copy p {
+  margin: 18px 0 0;
+  color: #6e6e73;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.project-hero-price {
+  flex: 0 0 auto;
+  padding-bottom: 6px;
+  text-align: right;
+}
+
+.project-hero-price span {
+  display: block;
+  color: #86868b;
+  font-size: 13px;
+}
+
+.project-hero-price strong {
+  display: block;
+  margin-top: 7px;
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+/* SUMMARY */
+
+.project-summary-section {
+  padding-top: 56px;
+}
+
+.project-summary-grid {
+  padding: 28px 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid #e8e8ed;
+  border-bottom: 1px solid #e8e8ed;
+}
+
+.project-summary-grid > div {
+  padding: 0 28px;
+  border-right: 1px solid #e8e8ed;
+}
+
+.project-summary-grid > div:first-child {
+  padding-left: 0;
+}
+
+.project-summary-grid > div:last-child {
+  border-right: 0;
+}
+
+.project-summary-grid span {
+  display: block;
+  color: #86868b;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.project-summary-grid strong {
+  display: block;
+  margin-top: 7px;
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+/* MAIN */
+
+.project-main-section {
+  padding-top: 110px;
+  padding-bottom: 120px;
+}
+
+.project-main-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.35fr)
+    minmax(340px, 0.65fr);
+  gap: 100px;
+  align-items: start;
+}
+
+.project-description h2 {
+  max-width: 680px;
+  margin: 12px 0 0;
+  font-size: clamp(38px, 5vw, 58px);
+  line-height: 1.02;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+}
+
+.project-description > p {
+  max-width: 720px;
+  margin: 30px 0 0;
+  color: #56565b;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+/* HIGHLIGHTS */
+
+.project-highlights {
+  margin-top: 70px;
+}
+
+.project-highlights h3 {
+  margin: 0 0 24px;
+  font-size: 24px;
+  letter-spacing: -0.025em;
+}
+
+.project-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.project-highlight-item {
+  min-height: 78px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: 16px;
+  background: #f7f7f8;
+}
+
+.project-highlight-item > span {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eaf2ed;
+  color: #194d3e;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.project-highlight-item p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+/* FINANCE CARD */
+
+.project-finance-card {
+  position: sticky;
+  top: 108px;
+  padding: 30px;
+  border: 1px solid #e4e4e7;
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.06);
+}
+
+.project-finance-head > span {
+  color: #194d3e;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.project-finance-head h3 {
+  margin: 10px 0 0;
+  font-size: 27px;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.project-finance-payment {
+  margin-top: 28px;
+  padding: 20px;
+  border-radius: 18px;
+  background: #f1f6f3;
+}
+
+.project-finance-payment span {
+  color: #6e6e73;
+  font-size: 13px;
+}
+
+.project-finance-payment strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 31px;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.project-finance-payment small {
+  display: block;
+  margin-top: 6px;
+  color: #86868b;
+  font-size: 12px;
+}
+
+.project-finance-facts {
+  margin: 26px 0;
+}
+
+.project-finance-facts div {
+  padding: 13px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid #eeeeef;
+}
+
+.project-finance-facts span {
+  color: #86868b;
+  font-size: 13px;
+}
+
+.project-finance-facts strong {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.project-secondary-cta {
+  min-height: 50px;
+  margin-top: 10px;
+  border: 1px solid #d2d2d7;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1d1d1f;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.project-secondary-cta:hover {
+  background: #f5f5f7;
+}
+
+.project-finance-note {
+  margin: 18px 0 0;
+  color: #86868b;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+/* FINAL CTA */
+
+.project-bottom-cta {
+  padding: 100px 0;
+  background: #f5f5f7;
+}
+
+.project-bottom-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 60px;
+}
+
+.project-bottom-inner h2 {
+  max-width: 760px;
+  margin: 12px 0 0;
+  font-size: clamp(40px, 5vw, 60px);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+/* TABLET */
+
+@media (max-width: 1000px) {
+  .project-hero-media {
+    aspect-ratio: 16 / 9;
+  }
+
+  .project-main-grid {
+    grid-template-columns: 1fr;
+    gap: 64px;
+  }
+
+  .project-finance-card {
+    position: static;
+  }
+
+  .project-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .project-summary-grid > div {
+    padding: 20px;
+    border-bottom: 1px solid #e8e8ed;
+  }
+
+  .project-summary-grid > div:nth-child(2) {
+    border-right: 0;
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 720px) {
+  .project-hero {
+    padding-top: 20px;
+  }
+
+  .project-hero-media {
+    border-radius: 20px;
+    aspect-ratio: 4 / 3;
+  }
+
+  .project-hero-badges {
+    top: 14px;
+    left: 14px;
+  }
+
+  .project-hero-info {
+    padding-top: 24px;
+    display: block;
+  }
+
+  .project-hero-copy h1 {
+    font-size: 44px;
+  }
+
+  .project-hero-price {
+    margin-top: 26px;
+    text-align: left;
+  }
+
+  .project-summary-section {
+    padding-top: 36px;
+  }
+
+  .project-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-summary-grid > div {
+    padding: 18px 0;
+    border-right: 0;
+  }
+
+  .project-main-section {
+    padding-top: 72px;
+    padding-bottom: 80px;
+  }
+
+  .project-main-grid {
+    gap: 46px;
+  }
+
+  .project-description h2 {
+    font-size: 38px;
+  }
+
+  .project-description > p {
+    font-size: 16px;
+  }
+
+  .project-highlights {
+    margin-top: 48px;
+  }
+
+  .project-highlights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-finance-card {
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  .project-bottom-cta {
+    padding: 72px 0;
+  }
+
+  .project-bottom-inner {
+    display: block;
+  }
+
+  .project-bottom-inner h2 {
+    font-size: 38px;
+  }
+
+  .project-bottom-inner .apple-pill {
+    margin-top: 30px;
+  }
+
+  .project-header-back {
+    display: none;
+  }
+}
+/* FIX: project card price/specs */
+.catalog-project-specs {
+  grid-template-columns: 1.35fr 1fr 1fr;
+  gap: 14px;
+}
+
+.catalog-project-specs strong {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.catalog-project-specs div:first-child strong {
+  white-space: nowrap;
+}

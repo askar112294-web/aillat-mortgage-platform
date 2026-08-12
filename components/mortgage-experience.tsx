@@ -6,6 +6,7 @@ import ProjectsCatalog from '@/components/projects-catalog'
 import { calculateMortgage, DEFAULT_PRODUCT, formatKzt } from '@/lib/mortgage'
 import { DEFAULT_FILTERS, findProjectBySlug, type ProjectFilters } from '@/lib/projects'
 import type { Partner, ProductConfig, PropertyProject } from '@/lib/types'
+import calculatorStyles from './mortgage-calculator.module.css'
 
 type Content = { product: ProductConfig; partners: Partner[]; projects: PropertyProject[] }
 type ApplicationState = { iin: string; phone: string; consent: boolean }
@@ -25,7 +26,9 @@ function AilatLogo({ dark = true }: { dark?: boolean }) {
 export default function MortgageExperience() {
   const [content, setContent] = useState<Content>({ product: DEFAULT_PRODUCT, partners: [], projects: [] })
   const [propertyPrice, setPropertyPrice] = useState(30_000_000)
+  const [propertyPriceInput, setPropertyPriceInput] = useState(formatInputNumber(30_000_000))
   const [downPayment, setDownPayment] = useState(9_000_000)
+  const [downPaymentInput, setDownPaymentInput] = useState(formatInputNumber(9_000_000))
   const [term, setTerm] = useState(60)
   const [selectedProject, setSelectedProject] = useState<PropertyProject | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -34,28 +37,60 @@ export default function MortgageExperience() {
   const [mobileMenu, setMobileMenu] = useState(false)
   const [projectFilters, setProjectFilters] = useState<ProjectFilters>(DEFAULT_FILTERS)
 
-  const applyProjectSelection = (project: PropertyProject, openApply = false) => {
-    setSelectedProject(project)
-    setPropertyPrice(project.priceFrom)
-    setDownPayment(Math.round(project.priceFrom * content.product.minDownPaymentPercent / 100))
-    if (openApply) {
-      setModalOpen(true)
-      setSubmitted(false)
-    }
-  }
-
   useEffect(() => {
     fetch('/api/content', { cache: 'no-store' })
       .then((r) => r.json())
       .then((data: Content) => {
         setContent(data)
-        const nextTerm = data.product.terms.includes(term) ? term : data.product.terms[data.product.terms.length - 1]
+
+        const nextTerm = data.product.terms.includes(term)
+          ? term
+          : data.product.terms[data.product.terms.length - 1]
+
+        const nextPrice = Math.min(
+          Math.max(propertyPrice, data.product.minPropertyPrice),
+          data.product.maxPropertyPrice,
+        )
+
+        const minDownPayment = Math.round(nextPrice * data.product.minDownPaymentPercent / 100)
+        const nextDownPayment = Math.max(downPayment, minDownPayment)
+
         setTerm(nextTerm)
-        setPropertyPrice((v) => Math.min(Math.max(v, data.product.minPropertyPrice), data.product.maxPropertyPrice))
-        setDownPayment((v) => Math.max(v, Math.round(30_000_000 * data.product.minDownPaymentPercent / 100)))
+        setPropertyPrice(nextPrice)
+        setPropertyPriceInput(formatInputNumber(nextPrice))
+        setDownPayment(nextDownPayment)
+        setDownPaymentInput(formatInputNumber(nextDownPayment))
       })
       .catch(() => undefined)
   }, [])
+
+  const product = content.product
+  const projects = content.projects.filter((p) => p.active)
+  const activePartners = content.partners.filter((p) => p.active)
+
+  const minDownPaymentForCurrentPrice = Math.round(
+    propertyPrice * product.minDownPaymentPercent / 100,
+  )
+
+  const result = useMemo(
+    () => calculateMortgage(propertyPrice, term, downPayment, product),
+    [propertyPrice, term, downPayment, product],
+  )
+
+  const applyProjectSelection = (project: PropertyProject, openApply = false) => {
+    const nextDownPayment = Math.round(project.priceFrom * product.minDownPaymentPercent / 100)
+
+    setSelectedProject(project)
+    setPropertyPrice(project.priceFrom)
+    setPropertyPriceInput(formatInputNumber(project.priceFrom))
+    setDownPayment(nextDownPayment)
+    setDownPaymentInput(formatInputNumber(nextDownPayment))
+
+    if (openApply) {
+      setModalOpen(true)
+      setSubmitted(false)
+    }
+  }
 
   useEffect(() => {
     if (!content.projects.length) return
@@ -72,24 +107,81 @@ export default function MortgageExperience() {
 
     params.delete('select')
     params.delete('apply')
+
     const nextQuery = params.toString()
     const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash}`
     window.history.replaceState(null, '', nextUrl)
-  }, [content.projects, content.product.minDownPaymentPercent])
+  }, [content.projects, product.minDownPaymentPercent])
 
-  const product = content.product
-  const projects = content.projects.filter((p) => p.active)
-  const activePartners = content.partners.filter((p) => p.active)
-  const result = useMemo(
-    () => calculateMortgage(propertyPrice, term, downPayment, product),
-    [propertyPrice, term, downPayment, product],
-  )
+  const calculatorIssue = useMemo(() => {
+    if (!propertyPrice) return 'Укажите стоимость недвижимости.'
 
-  const onPriceChange = (value: string) => {
-    const next = Math.max(Number(digits(value)) || 0, 0)
+    if (propertyPrice < product.minPropertyPrice) {
+      return `Минимальная стоимость недвижимости — ${formatKzt(product.minPropertyPrice)}.`
+    }
+
+    if (propertyPrice > product.maxPropertyPrice) {
+      return `Максимальная стоимость недвижимости — ${formatKzt(product.maxPropertyPrice)}.`
+    }
+
+    if (!downPayment) return 'Укажите первоначальный взнос.'
+
+    if (downPayment < minDownPaymentForCurrentPrice) {
+      return `Минимальный первоначальный взнос — ${product.minDownPaymentPercent}% (${formatKzt(minDownPaymentForCurrentPrice)}).`
+    }
+
+    if (downPayment >= propertyPrice) {
+      return 'Первоначальный взнос должен быть меньше стоимости недвижимости.'
+    }
+
+    if (!result.eligible) {
+      return result.eligibilityReason || 'Параметры не соответствуют условиям продукта.'
+    }
+
+    return null
+  }, [
+    propertyPrice,
+    downPayment,
+    product,
+    minDownPaymentForCurrentPrice,
+    result.eligible,
+    result.eligibilityReason,
+  ])
+
+  const calculatorEligible = !calculatorIssue && result.eligible
+
+  const onPriceInputChange = (value: string) => {
+    const numeric = digits(value)
+    const next = numeric ? Number(numeric) : 0
+
     setPropertyPrice(next)
-    setDownPayment(Math.round(next * product.minDownPaymentPercent / 100))
-    if (selectedProject && next !== selectedProject.priceFrom) setSelectedProject(null)
+    setPropertyPriceInput(numeric ? formatInputNumber(next) : '')
+
+    if (selectedProject && next !== selectedProject.priceFrom) {
+      setSelectedProject(null)
+    }
+  }
+
+  const onPriceSliderChange = (value: number) => {
+    setPropertyPrice(value)
+    setPropertyPriceInput(formatInputNumber(value))
+
+    if (selectedProject && value !== selectedProject.priceFrom) {
+      setSelectedProject(null)
+    }
+  }
+
+  const onDownPaymentInputChange = (value: string) => {
+    const numeric = digits(value)
+    const next = numeric ? Number(numeric) : 0
+
+    setDownPayment(next)
+    setDownPaymentInput(numeric ? formatInputNumber(next) : '')
+  }
+
+  const onDownPaymentSliderChange = (value: number) => {
+    setDownPayment(value)
+    setDownPaymentInput(formatInputNumber(value))
   }
 
   const chooseProject = (project: PropertyProject) => {
@@ -111,6 +203,7 @@ export default function MortgageExperience() {
   }
 
   const openApplication = () => {
+    if (!calculatorEligible) return
     setModalOpen(true)
     setSubmitted(false)
   }
@@ -119,7 +212,13 @@ export default function MortgageExperience() {
 
   const submitApplication = async (event: FormEvent) => {
     event.preventDefault()
-    if (digits(application.iin).length !== 12 || digits(application.phone).length < 10 || !application.consent) return
+
+    if (
+      digits(application.iin).length !== 12 ||
+      digits(application.phone).length < 10 ||
+      !application.consent ||
+      !calculatorEligible
+    ) return
 
     const payload = {
       iin: digits(application.iin),
@@ -164,8 +263,8 @@ export default function MortgageExperience() {
       <section className="apple-hero apple-container">
         <div className="apple-hero-copy">
           <span className="apple-eyebrow">Ailat Finance</span>
-          <h1>Исламская ипотека.<br/>Понятно с первого шага.</h1>
-          <p>Выберите жилье у партнеров Ailat Finance, рассчитайте условия финансирования и получите предварительное решение онлайн.</p>
+          <h1>Исламская ипотека<br/>Понятно с первого шага</h1>
+          <p>Выберите жилье у партнеров Ailat Finance, рассчитайте условия финансирования и получите предварительное решение онлайн</p>
           <div className="apple-hero-actions">
             <a className="apple-pill apple-pill-large" href="#calculator">Получить предварительное решение</a>
             <a className="apple-link-arrow" href="#projects">Смотреть жилые комплексы <span>→</span></a>
@@ -211,77 +310,162 @@ export default function MortgageExperience() {
         </div>
       </section>
 
-      <section id="calculator" className="apple-calculator-section">
+      <section id="calculator" className={calculatorStyles.section}>
         <div className="apple-container">
-          <div className="apple-section-intro apple-centered apple-calc-intro">
-            <h2>Рассчитайте финансирование</h2>
-            <p>Изменяйте стоимость недвижимости, первоначальный взнос и срок — расчет обновится автоматически.</p>
+          <div className={calculatorStyles.intro}>
+            <span className="apple-section-label">Калькулятор</span>
+            <h2>Рассчитайте комфортный платеж</h2>
+            <p>Укажите стоимость недвижимости, первоначальный взнос и срок. Все денежные значения можно вводить вручную.</p>
           </div>
 
-          <div className="apple-calculator-card">
-            <div className="apple-calc-controls">
-              {selectedProject && (
-                <div className="apple-selected-project">
-                  <div><span>Выбран объект</span><strong>{selectedProject.name}</strong></div>
-                  <button onClick={() => setSelectedProject(null)} aria-label="Убрать выбранный объект">×</button>
+          <div className={calculatorStyles.card}>
+            <div className={calculatorStyles.controls}>
+              {selectedProject ? (
+                <div className={calculatorStyles.selectedProject}>
+                  <div>
+                    <span>Выбран жилой комплекс</span>
+                    <strong>{selectedProject.name}</strong>
+                  </div>
+                  <button type="button" onClick={() => setSelectedProject(null)} aria-label="Убрать выбранный объект">×</button>
                 </div>
-              )}
+              ) : null}
 
-              <div className="apple-control-block">
-                <div className="apple-control-label"><span>Стоимость недвижимости</span><b>{formatKzt(propertyPrice)}</b></div>
+              <div className={calculatorStyles.control}>
+                <div className={calculatorStyles.controlHeader}>
+                  <div>
+                    <span>Стоимость недвижимости</span>
+                    <small>Введите сумму вручную или используйте ползунок</small>
+                  </div>
+                </div>
+
+                <label className={calculatorStyles.moneyInput}>
+                  <input
+                    value={propertyPriceInput}
+                    onChange={(e) => onPriceInputChange(e.target.value)}
+                    inputMode="numeric"
+                    placeholder="30 000 000"
+                    aria-label="Стоимость недвижимости"
+                  />
+                  <span>₸</span>
+                </label>
+
                 <input
-                  className="apple-range"
+                  className={calculatorStyles.range}
                   type="range"
                   min={product.minPropertyPrice}
                   max={product.maxPropertyPrice}
-                  step="500000"
-                  value={Math.min(Math.max(propertyPrice, product.minPropertyPrice), product.maxPropertyPrice)}
-                  onChange={(e) => onPriceChange(e.target.value)}
-                />
-                <div className="apple-range-values"><span>{formatKzt(product.minPropertyPrice)}</span><span>{formatKzt(product.maxPropertyPrice)}</span></div>
-                <div className="apple-inline-input"><input value={formatInputNumber(propertyPrice)} onChange={(e) => onPriceChange(e.target.value)} inputMode="numeric"/><span>₸</span></div>
-              </div>
-
-              <div className="apple-control-block">
-                <div className="apple-control-label"><span>Первоначальный взнос</span><b>{result.downPaymentPercent}%</b></div>
-                <input
-                  className="apple-range"
-                  type="range"
-                  min={result.minDownPayment}
-                  max={Math.max(propertyPrice * .8, result.minDownPayment)}
                   step="100000"
-                  value={Math.min(result.downPayment, Math.max(propertyPrice * .8, result.minDownPayment))}
-                  onChange={(e) => setDownPayment(Number(e.target.value))}
+                  value={Math.min(Math.max(propertyPrice || product.minPropertyPrice, product.minPropertyPrice), product.maxPropertyPrice)}
+                  onChange={(e) => onPriceSliderChange(Number(e.target.value))}
                 />
-                <div className="apple-range-values"><span>минимум {product.minDownPaymentPercent}%</span><span>{formatKzt(result.downPayment)}</span></div>
+
+                <div className={calculatorStyles.rangeValues}>
+                  <span>{formatKzt(product.minPropertyPrice)}</span>
+                  <span>{formatKzt(product.maxPropertyPrice)}</span>
+                </div>
               </div>
 
-              <div className="apple-control-block apple-control-last">
-                <div className="apple-control-label"><span>Срок финансирования</span><b>{term} мес.</b></div>
-                <div className="apple-term-tabs">
+              <div className={calculatorStyles.control}>
+                <div className={calculatorStyles.controlHeader}>
+                  <div>
+                    <span>Первоначальный взнос</span>
+                    <small>Минимум {product.minDownPaymentPercent}% от стоимости недвижимости</small>
+                  </div>
+                  <strong>
+                    {propertyPrice > 0 ? `${Math.round((downPayment / propertyPrice) * 100)}%` : '0%'}
+                  </strong>
+                </div>
+
+                <label className={calculatorStyles.moneyInput}>
+                  <input
+                    value={downPaymentInput}
+                    onChange={(e) => onDownPaymentInputChange(e.target.value)}
+                    inputMode="numeric"
+                    placeholder="9 000 000"
+                    aria-label="Первоначальный взнос"
+                  />
+                  <span>₸</span>
+                </label>
+
+                <input
+                  className={calculatorStyles.range}
+                  type="range"
+                  min={Math.min(minDownPaymentForCurrentPrice, Math.max(propertyPrice, 1))}
+                  max={Math.max(propertyPrice, minDownPaymentForCurrentPrice, 1)}
+                  step="100000"
+                  value={Math.min(
+                    Math.max(downPayment || minDownPaymentForCurrentPrice, minDownPaymentForCurrentPrice),
+                    Math.max(propertyPrice, minDownPaymentForCurrentPrice),
+                  )}
+                  onChange={(e) => onDownPaymentSliderChange(Number(e.target.value))}
+                  disabled={!propertyPrice}
+                />
+
+                <div className={calculatorStyles.rangeValues}>
+                  <span>Минимум {formatKzt(minDownPaymentForCurrentPrice)}</span>
+                  <span>{propertyPrice ? formatKzt(propertyPrice) : '—'}</span>
+                </div>
+              </div>
+
+              <div className={`${calculatorStyles.control} ${calculatorStyles.termControl}`}>
+                <div className={calculatorStyles.controlHeader}>
+                  <div>
+                    <span>Срок финансирования</span>
+                    <small>Выберите удобный срок</small>
+                  </div>
+                  <strong>{term} мес.</strong>
+                </div>
+
+                <div className={calculatorStyles.terms}>
                   {product.terms.map((months) => (
-                    <button key={months} className={term === months ? 'active' : ''} onClick={() => setTerm(months)}>{months}<span>мес.</span></button>
+                    <button
+                      type="button"
+                      key={months}
+                      className={term === months ? calculatorStyles.termActive : ''}
+                      onClick={() => setTerm(months)}
+                    >
+                      <strong>{months}</strong>
+                      <span>мес.</span>
+                    </button>
                   ))}
                 </div>
               </div>
+
+              {calculatorIssue ? (
+                <div className={calculatorStyles.validation}>
+                  <span>!</span>
+                  <p>{calculatorIssue}</p>
+                </div>
+              ) : (
+                <div className={calculatorStyles.valid}>
+                  <span>✓</span>
+                  <p>Параметры соответствуют текущим условиям продукта</p>
+                </div>
+              )}
             </div>
 
-            <div className="apple-calc-summary">
-              <div>
-                <span className="apple-summary-label">Ориентировочный платеж</span>
-                <strong className="apple-summary-payment">{formatKzt(result.monthlyPayment)}</strong>
-                <span className="apple-summary-period">в месяц*</span>
+            <aside className={calculatorStyles.summary}>
+              <div className={calculatorStyles.summaryTop}>
+                <span>Ориентировочный платеж</span>
+                <strong>{calculatorEligible ? formatKzt(result.monthlyPayment) : '—'}</strong>
+                <small>в месяц*</small>
               </div>
-              <div className="apple-summary-list">
-                <div><span>Стоимость</span><b>{formatKzt(result.propertyPrice)}</b></div>
-                <div><span>Ваш взнос</span><b>{formatKzt(result.downPayment)}</b></div>
-                <div><span>Финансирование</span><b>{formatKzt(result.financingAmount)}</b></div>
-                <div><span>Срок</span><b>{result.termMonths} мес.</b></div>
+
+              <div className={calculatorStyles.summaryList}>
+                <div><span>Стоимость недвижимости</span><strong>{propertyPrice ? formatKzt(propertyPrice) : '—'}</strong></div>
+                <div><span>Первоначальный взнос</span><strong>{downPayment ? formatKzt(downPayment) : '—'}</strong></div>
+                <div><span>Сумма финансирования</span><strong>{calculatorEligible ? formatKzt(result.financingAmount) : '—'}</strong></div>
+                <div><span>Срок</span><strong>{term} мес.</strong></div>
               </div>
-              {!result.eligible && <div className="apple-alert">{result.eligibilityReason}</div>}
-              <button className="apple-pill apple-pill-full" disabled={!result.eligible} onClick={openApplication}>{product.applicationCta}</button>
-              <p className="apple-fineprint">*Предварительный расчет. Не является офертой или решением о предоставлении финансирования.</p>
-            </div>
+
+              <button className={calculatorStyles.cta} type="button" disabled={!calculatorEligible} onClick={openApplication}>
+                {product.applicationCta}
+              </button>
+
+              <p className={calculatorStyles.fineprint}>
+                *Предварительный расчет. Не является офертой или решением о предоставлении финансирования.
+              </p>
+            </aside>
           </div>
         </div>
       </section>
@@ -307,13 +491,13 @@ export default function MortgageExperience() {
         <div className="apple-container">
           <div className="apple-section-intro apple-centered apple-how-intro">
             <span className="apple-section-label">Как это работает</span>
-            <h2>Четыре шага до решения.</h2>
+            <h2>Четыре шага до решения</h2>
           </div>
           <div className="apple-how-grid">
-            <div><span>1</span><h3>Выберите объект</h3><p>Из каталога партнеров или укажите стоимость самостоятельно.</p></div>
-            <div><span>2</span><h3>Настройте расчет</h3><p>Выберите первоначальный взнос и подходящий срок финансирования.</p></div>
-            <div><span>3</span><h3>Оставьте контакты</h3><p>ИИН, номер телефона и согласие на обработку персональных данных.</p></div>
-            <div><span>4</span><h3>Получите обратную связь</h3><p>Менеджер Ailat свяжется с вами по предварительной заявке.</p></div>
+            <div><span>1</span><h3>Выберите объект</h3><p>Из каталога партнеров или укажите стоимость самостоятельно</p></div>
+            <div><span>2</span><h3>Настройте расчет</h3><p>Выберите первоначальный взнос и подходящий срок финансирования</p></div>
+            <div><span>3</span><h3>Оставьте контакты</h3><p>ИИН, номер телефона и согласие на обработку персональных данных</p></div>
+            <div><span>4</span><h3>Получите обратную связь</h3><p>Менеджер Ailat свяжется с вами по предварительной заявке</p></div>
           </div>
         </div>
       </section>
@@ -321,14 +505,14 @@ export default function MortgageExperience() {
       <section className="apple-final-cta">
         <div className="apple-container apple-final-inner">
           <span className="apple-section-label">Ailat Mortgage</span>
-          <h2>Начните с расчета.<br/>Остальное — проще.</h2>
+          <h2>Начните с расчета<br/>Остальное — проще</h2>
           <a className="apple-pill apple-pill-large" href="#calculator">Рассчитать финансирование</a>
         </div>
       </section>
 
       <footer className="apple-footer">
         <div className="apple-container apple-footer-grid">
-          <div><AilatLogo dark={false}/><p>Цифровая витрина исламского финансирования недвижимости.</p></div>
+          <div><AilatLogo dark={false}/><p>Цифровая витрина исламского финансирования недвижимости</p></div>
           <div><strong>Продукт</strong><a href="#mortgage">Ипотека</a><a href="#calculator">Калькулятор</a><a href="#projects">Жилые комплексы</a><a href="#how-it-works">Как это работает</a></div>
           <div><strong>Компания</strong><a href="https://ailat.kz" target="_blank" rel="noreferrer">Ailat Finance ↗</a><a href="/admin">Администрирование</a></div>
         </div>
@@ -352,10 +536,22 @@ export default function MortgageExperience() {
                 <span className="apple-section-label">Предварительная заявка</span>
                 <h2>Всего два поля.</h2>
                 <p className="apple-modal-lead">Параметры финансирования уже перенесены из вашего расчета.</p>
-                <div className="apple-modal-summary"><div><span>Финансирование</span><b>{formatKzt(result.financingAmount)}</b></div><div><span>Платеж</span><b>{formatKzt(result.monthlyPayment)}</b></div></div>
-                <label className="apple-form-field"><span>ИИН</span><input maxLength={12} inputMode="numeric" placeholder="000000000000" value={application.iin} onChange={(e) => setApplication({ ...application, iin: digits(e.target.value) })}/></label>
-                <label className="apple-form-field"><span>Номер телефона</span><input placeholder="+7 700 000 00 00" value={application.phone} onChange={(e) => setApplication({ ...application, phone: e.target.value })}/></label>
-                <label className="apple-consent"><input type="checkbox" checked={application.consent} onChange={(e) => setApplication({ ...application, consent: e.target.checked })}/><span>Я согласен на сбор и обработку персональных данных и подтверждаю ознакомление с условиями.</span></label>
+                <div className="apple-modal-summary">
+                  <div><span>Финансирование</span><b>{formatKzt(result.financingAmount)}</b></div>
+                  <div><span>Платеж</span><b>{formatKzt(result.monthlyPayment)}</b></div>
+                </div>
+                <label className="apple-form-field">
+                  <span>ИИН</span>
+                  <input maxLength={12} inputMode="numeric" placeholder="000000000000" value={application.iin} onChange={(e) => setApplication({ ...application, iin: digits(e.target.value) })}/>
+                </label>
+                <label className="apple-form-field">
+                  <span>Номер телефона</span>
+                  <input placeholder="+7 700 000 00 00" value={application.phone} onChange={(e) => setApplication({ ...application, phone: e.target.value })}/>
+                </label>
+                <label className="apple-consent">
+                  <input type="checkbox" checked={application.consent} onChange={(e) => setApplication({ ...application, consent: e.target.checked })}/>
+                  <span>Я согласен на сбор и обработку персональных данных и подтверждаю ознакомление с условиями.</span>
+                </label>
                 <button className="apple-pill apple-pill-full" type="submit">Отправить заявку</button>
               </form>
             )}

@@ -63,16 +63,34 @@
       "accent": "lime",
       "description": "Современный жилой квартал рядом с ключевой городской инфраструктурой.",
       "active": true,
-      "address": "",
-      "priceTo": null,
-      "areaFrom": null,
-      "areaTo": null,
+      "address": "проспект Нура 25",
+      "areaFrom": 35,
+      "areaTo": 140,
       "coverImageUrl": "/uploads/projects/project-1786455345148-qliy8d.jpg",
       "gallery": [
         "/uploads/projects/project-1786526465103-fbpvbk.jpg",
         "/uploads/projects/project-1786526465113-9bqr51.jpg",
         "/uploads/projects/project-1786526465130-x6owo3.jpg",
         "/uploads/projects/project-1786526465160-ygqrwi.jpg"
+      ],
+      "housingClass": "Бизнес",
+      "buildingType": "Монолитный",
+      "floors": 11,
+      "ceilingHeight": 4,
+      "attributes": [
+        {
+          "id": "attribute-1786531798944-ybsa",
+          "label": "Подземный паркинг ",
+          "value": "Подземный паркинг "
+        }
+      ],
+      "features": [
+        {
+          "id": "feature-1786531824759-jzz3",
+          "icon": "✓",
+          "title": "",
+          "description": ""
+        }
       ]
     },
     {
@@ -81,7 +99,7 @@
       "name": "Grand Turan",
       "city": "Астана",
       "district": "Нура район",
-      "priceFrom": 28900000,
+      "priceFrom": 28000000,
       "completion": "IV квартал 2026",
       "badge": "Новый проект",
       "accent": "violet",
@@ -89,7 +107,7 @@
       "active": true,
       "address": "",
       "priceTo": null,
-      "areaFrom": null,
+      "areaFrom": 45,
       "areaTo": null,
       "coverImageUrl": "/uploads/projects/project-1786455397848-vvzvwy.jpg",
       "gallery": []
@@ -108,7 +126,7 @@
       "active": true,
       "address": "",
       "priceTo": null,
-      "areaFrom": null,
+      "areaFrom": 55,
       "areaTo": null,
       "coverImageUrl": "/uploads/projects/project-1786455424619-r5tyg5.jpg",
       "gallery": []
@@ -137,6 +155,29 @@
       "createdAt": "2026-08-11T09:57:25.443Z",
       "status": "in_progress",
       "updatedAt": "2026-08-11T10:12:20.385Z"
+    },
+    {
+      "iin": "900900900900",
+      "phone": "77087257550",
+      "selectedProjectId": null,
+      "source": "calculator",
+      "propertyPrice": 30000000,
+      "minDownPayment": 6000000,
+      "downPayment": 7000000,
+      "downPaymentPercent": 23.3,
+      "financingAmount": 23000000,
+      "termMonths": 36,
+      "monthlyPayment": 983889,
+      "totalRepayment": 35420000,
+      "eligible": true,
+      "eligibilityReason": null,
+      "consentAccepted": true,
+      "consentVersion": "2026-08-11-v1",
+      "consentAcceptedAt": "2026-08-12T10:32:49.637Z",
+      "id": "APP-1786530770000",
+      "createdAt": "2026-08-12T10:32:50.000Z",
+      "status": "approved",
+      "updatedAt": "2026-08-12T10:33:12.142Z"
     }
   ]
 }

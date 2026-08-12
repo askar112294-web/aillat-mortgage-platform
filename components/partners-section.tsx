@@ -188,9 +188,10 @@ export default function PartnersSection({
                               от&nbsp;
                               {priceFrom.toLocaleString('ru-RU', {
                                 style: 'currency',
-                                currency: 'RUB',
-                                maximumFractionDigits: 0
-                              })}
+                                currency: 'KZT',
+                                maximumFractionDigits: 0,
+                                minimumFractionDigits: 0
+                                })}
                             </span>
                           </>
                         )}

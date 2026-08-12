@@ -1,6 +1,6 @@
 .page {
   min-height: 100vh;
-  background: #ffffff;
+  background: #fff;
   color: #171918;
 }
 
@@ -8,8 +8,8 @@
   position: sticky;
   top: 0;
   z-index: 30;
-  border-bottom: 1px solid rgba(20, 25, 23, 0.06);
-  background: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid rgba(20, 25, 23, .06);
+  background: rgba(255, 255, 255, .88);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
@@ -49,7 +49,7 @@
   font-size: 22px;
   line-height: 1;
   font-weight: 750;
-  letter-spacing: -0.04em;
+  letter-spacing: -.04em;
 }
 
 .brandText span {
@@ -69,10 +69,6 @@
   text-decoration: none;
 }
 
-.backLink:hover {
-  color: #171918;
-}
-
 .headerCta {
   min-height: 42px;
   padding: 0 18px;
@@ -81,7 +77,7 @@
   justify-content: center;
   border-radius: 999px;
   background: #13231d;
-  color: #ffffff;
+  color: #fff;
   font-size: 14px;
   font-weight: 650;
   text-decoration: none;
@@ -95,21 +91,13 @@
 
 .gallery {
   display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(260px, 0.65fr);
+  grid-template-columns: minmax(0, 1.65fr) minmax(260px, .65fr);
   gap: 10px;
   width: 100%;
   aspect-ratio: 16 / 7.4;
   min-height: 0;
   max-height: 620px;
   overflow: hidden;
-}
-
-.mainImageButton,
-.thumbButton {
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  background: transparent;
 }
 
 .mainImageButton {
@@ -142,7 +130,14 @@
 
 .thumbButton {
   position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
   background: #f1f3f1;
 }
 
@@ -159,15 +154,11 @@
   height: 100%;
   display: block;
   object-fit: cover;
-  transition: transform 220ms ease, opacity 220ms ease;
+  transition: transform 220ms ease;
 }
 
 .thumbButton:hover img {
   transform: scale(1.03);
-}
-
-.thumbButtonActive img {
-  opacity: .72;
 }
 
 .morePhotos {
@@ -180,7 +171,6 @@
   color: #fff;
   font-size: 12px;
   font-weight: 650;
-  backdrop-filter: blur(10px);
 }
 
 .badges {
@@ -196,13 +186,10 @@
 .badges span {
   padding: 8px 13px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, .9);
   color: #171918;
   font-size: 12px;
-  line-height: 1;
   font-weight: 650;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .mobileThumbs {
@@ -217,7 +204,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 48px;
   align-items: end;
-  background: #ffffff;
+  background: #fff;
 }
 
 .partner {
@@ -226,7 +213,7 @@
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: .08em;
 }
 
 .heroCopy h1 {
@@ -234,9 +221,9 @@
   margin: 10px 0 0;
   color: #171918;
   font-size: clamp(48px, 6vw, 76px);
-  line-height: 0.98;
+  line-height: .98;
   font-weight: 760;
-  letter-spacing: -0.06em;
+  letter-spacing: -.06em;
 }
 
 .address {
@@ -264,7 +251,7 @@
   font-size: 28px;
   line-height: 1.05;
   font-weight: 730;
-  letter-spacing: -0.035em;
+  letter-spacing: -.035em;
   white-space: nowrap;
 }
 
@@ -291,13 +278,14 @@
   border-right: 0;
 }
 
-.quickFacts span {
+.quickFacts span,
+.infoItem span {
   display: block;
   color: #8b8f8c;
   font-size: 11px;
   font-weight: 650;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: .08em;
 }
 
 .quickFacts strong {
@@ -312,14 +300,15 @@
 .contentGrid {
   width: min(1220px, calc(100% - 48px));
   margin: 0 auto;
-  padding: 104px 0 120px;
+  padding: 92px 0 112px;
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(350px, 0.7fr);
-  gap: 92px;
+  grid-template-columns: minmax(0, 1.45fr) minmax(350px, .7fr);
+  gap: 82px;
   align-items: start;
 }
 
 .sectionIntro > span,
+.blockHeading > span,
 .finalCta > div > span,
 .financeHeading > span {
   color: #235b47;
@@ -327,7 +316,7 @@
   line-height: 1;
   font-weight: 720;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: .08em;
 }
 
 .sectionIntro h2 {
@@ -337,64 +326,107 @@
   font-size: clamp(38px, 4.5vw, 58px);
   line-height: 1.02;
   font-weight: 750;
-  letter-spacing: -0.05em;
+  letter-spacing: -.05em;
 }
 
 .description {
   max-width: 760px;
-  margin: 28px 0 0;
+  margin: 26px 0 0;
   color: #535854;
   font-size: 18px;
   line-height: 1.72;
 }
 
-.highlights {
-  margin-top: 64px;
+.infoSection,
+.featuresSection {
+  margin-top: 70px;
+  padding-top: 42px;
+  border-top: 1px solid #e8ebe9;
 }
 
-.highlights h3 {
-  margin: 0 0 20px;
-  font-size: 24px;
-  line-height: 1.2;
-  font-weight: 700;
-  letter-spacing: -0.03em;
+.blockHeading h3 {
+  margin: 10px 0 0;
+  color: #171918;
+  font-size: 30px;
+  line-height: 1.08;
+  font-weight: 720;
+  letter-spacing: -.04em;
 }
 
-.highlightsGrid {
+.infoGrid {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid #e7eae8;
+}
+
+.infoItem {
+  min-height: 102px;
+  padding: 24px 20px 22px 0;
+  border-bottom: 1px solid #e7eae8;
+}
+
+.infoItem:nth-child(odd) {
+  border-right: 1px solid #e7eae8;
+}
+
+.infoItem:nth-child(even) {
+  padding-left: 26px;
+}
+
+.infoItem strong {
+  display: block;
+  margin-top: 9px;
+  color: #242825;
+  font-size: 19px;
+  line-height: 1.3;
+  font-weight: 680;
+}
+
+.featuresGrid {
+  margin-top: 26px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
-.highlight {
-  min-height: 72px;
-  padding: 17px 18px;
+.featureCard {
+  min-height: 126px;
+  padding: 21px;
   display: flex;
-  align-items: center;
-  gap: 13px;
-  border-radius: 16px;
-  background: #f6f8f6;
+  align-items: flex-start;
+  gap: 15px;
+  border-radius: 18px;
+  background: #f5f7f5;
 }
 
-.highlight > span {
-  width: 27px;
-  height: 27px;
+.featureIcon {
+  width: 38px;
+  height: 38px;
   flex: 0 0 auto;
   display: grid;
   place-items: center;
-  border-radius: 50%;
+  border-radius: 12px;
   background: #e6f0ea;
   color: #235b47;
-  font-size: 13px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 750;
 }
 
-.highlight p {
-  margin: 0;
-  color: #343835;
-  font-size: 15px;
-  line-height: 1.35;
-  font-weight: 560;
+.featureCard strong {
+  display: block;
+  padding-top: 3px;
+  color: #242825;
+  font-size: 16px;
+  line-height: 1.3;
+  font-weight: 680;
+}
+
+.featureCard p {
+  margin: 7px 0 0;
+  color: #777c78;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .financeCard {
@@ -403,8 +435,8 @@
   padding: 28px;
   border: 1px solid #e1e4e2;
   border-radius: 26px;
-  background: #ffffff;
-  box-shadow: 0 22px 60px rgba(19, 35, 29, 0.07);
+  background: #fff;
+  box-shadow: 0 22px 60px rgba(19, 35, 29, .07);
 }
 
 .financeHeading h3 {
@@ -413,7 +445,7 @@
   font-size: 26px;
   line-height: 1.1;
   font-weight: 720;
-  letter-spacing: -0.04em;
+  letter-spacing: -.04em;
 }
 
 .payment {
@@ -435,7 +467,7 @@
   font-size: 31px;
   line-height: 1.05;
   font-weight: 760;
-  letter-spacing: -0.04em;
+  letter-spacing: -.04em;
   white-space: nowrap;
 }
 
@@ -485,13 +517,13 @@
 
 .primaryCta {
   background: #143d31;
-  color: #ffffff;
+  color: #fff;
 }
 
 .secondaryCta {
   margin-top: 9px;
   border: 1px solid #d7dad8;
-  background: #ffffff;
+  background: #fff;
   color: #222522;
 }
 
@@ -521,7 +553,7 @@
   font-size: clamp(38px, 4.5vw, 56px);
   line-height: 1;
   font-weight: 750;
-  letter-spacing: -0.05em;
+  letter-spacing: -.05em;
 }
 
 .finalButton {
@@ -529,7 +561,7 @@
   min-width: 210px;
   padding: 0 22px;
   background: #143d31;
-  color: #ffffff;
+  color: #fff;
 }
 
 @media (max-width: 1000px) {
@@ -537,6 +569,7 @@
     grid-template-columns: 1fr;
     height: auto;
     min-height: 0;
+    aspect-ratio: auto;
   }
 
   .mainImageButton {
@@ -587,15 +620,6 @@
 
   .quickFacts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .quickFacts > div {
-    padding: 18px 22px;
-    border-bottom: 1px solid #e5e7e5;
-  }
-
-  .quickFacts > div:nth-child(2) {
-    border-right: 0;
   }
 
   .finalCta {
@@ -664,7 +688,7 @@
   }
 
   .contentGrid {
-    padding: 70px 0 78px;
+    padding: 66px 0 76px;
     gap: 42px;
   }
 
@@ -676,12 +700,33 @@
     font-size: 16px;
   }
 
-  .highlights {
-    margin-top: 44px;
+  .infoSection,
+  .featuresSection {
+    margin-top: 52px;
+    padding-top: 32px;
   }
 
-  .highlightsGrid {
+  .blockHeading h3 {
+    font-size: 27px;
+  }
+
+  .infoGrid {
     grid-template-columns: 1fr;
+  }
+
+  .infoItem,
+  .infoItem:nth-child(even) {
+    min-height: 0;
+    padding: 19px 0;
+    border-right: 0;
+  }
+
+  .featuresGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .featureCard {
+    min-height: 0;
   }
 
   .financeCard {
