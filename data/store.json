@@ -68,7 +68,12 @@
       "areaFrom": null,
       "areaTo": null,
       "coverImageUrl": "/uploads/projects/project-1786455345148-qliy8d.jpg",
-      "gallery": []
+      "gallery": [
+        "/uploads/projects/project-1786526465103-fbpvbk.jpg",
+        "/uploads/projects/project-1786526465113-9bqr51.jpg",
+        "/uploads/projects/project-1786526465130-x6owo3.jpg",
+        "/uploads/projects/project-1786526465160-ygqrwi.jpg"
+      ]
     },
     {
       "id": "sensata",

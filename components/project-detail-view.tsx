@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import ProjectImage from '@/components/project-image'
 import { formatKzt } from '@/lib/mortgage'
 import {
@@ -14,6 +14,7 @@ import {
   getProjectSlug,
 } from '@/lib/projects'
 import type { Partner, ProductConfig, PropertyProject } from '@/lib/types'
+import styles from './project-detail-view.module.css'
 
 type ProjectDetailViewProps = {
   project: PropertyProject
@@ -21,7 +22,11 @@ type ProjectDetailViewProps = {
   product: ProductConfig
 }
 
-export default function ProjectDetailView({ project, partner, product }: ProjectDetailViewProps) {
+export default function ProjectDetailView({
+  project,
+  partner,
+  product,
+}: ProjectDetailViewProps) {
   const payment = useMemo(() => getProjectPayment(project, product), [project, product])
   const area = formatProjectArea(project)
   const highlights = getProjectHighlights(project)
@@ -29,69 +34,178 @@ export default function ProjectDetailView({ project, partner, product }: Project
   const calcHref = `/?select=${encodeURIComponent(slug)}#calculator`
   const applyHref = `/?select=${encodeURIComponent(slug)}&apply=1#calculator`
 
+  const images = useMemo(() => {
+    const items = [
+      project.coverImageUrl?.trim() || '',
+      ...(project.gallery || []).map((item) => item.trim()),
+    ].filter(Boolean)
+    return Array.from(new Set(items))
+  }, [project.coverImageUrl, project.gallery])
+
+  const [activeImage, setActiveImage] = useState(0)
+  const activeUrl = images[activeImage] || project.coverImageUrl || ''
+  const sideImages = images.filter((_, index) => index !== activeImage).slice(0, 3)
+
   return (
-    <main className="project-detail-page">
-      <header className="apple-header-shell">
-        <div className="apple-header apple-container">
-          <Link className="apple-brand" href="/" aria-label="Ailat Finance">
-            <span className="apple-brand-mark">a</span>
-            <span>ailat<span className="apple-brand-dot">.</span></span>
+    <main className={styles.page}>
+      <header className={styles.header}>
+        <div className={styles.headerInner}>
+          <Link className={styles.brand} href="/" aria-label="Ailat Finance">
+            <span className={styles.brandMark}>a</span>
+            <span className={styles.brandText}>ailat<span>.</span></span>
           </Link>
-          <div className="apple-header-actions">
-            <Link className="apple-pill apple-pill-small" href={calcHref}>Рассчитать</Link>
+
+          <div className={styles.headerActions}>
+            <Link className={styles.backLink} href="/#projects">Все ЖК</Link>
+            <Link className={styles.headerCta} href={calcHref}>Рассчитать</Link>
           </div>
         </div>
       </header>
 
-      <section className="project-detail-hero">
-        <ProjectImage project={project} className="project-detail-cover" />
-        <div className="apple-container project-detail-hero-copy">
-          <span className="apple-section-label">{getConstructionStatusLabel(project)}</span>
-          <h1>{project.name}</h1>
-          <p>{partner?.name ?? 'Партнер Ailat'} · {project.city}</p>
+      <section className={styles.hero}>
+        {images.length ? (
+          <>
+            <div className={styles.gallery}>
+              <button className={styles.mainImageButton} type="button">
+                <img className={styles.mainImage} src={activeUrl} alt={project.name} />
+                <div className={styles.badges}>
+                  <span>{getConstructionStatusLabel(project)}</span>
+                  {project.badge ? <span>{project.badge}</span> : null}
+                </div>
+              </button>
+
+              <div className={styles.thumbRail}>
+                {sideImages.length ? sideImages.map((url, sideIndex) => {
+                  const realIndex = images.indexOf(url)
+                  return (
+                    <button
+                      className={`${styles.thumbButton} ${realIndex === activeImage ? styles.thumbButtonActive : ''}`}
+                      type="button"
+                      key={url}
+                      onClick={() => setActiveImage(realIndex)}
+                    >
+                      <img src={url} alt={`${project.name} — фото ${realIndex + 1}`} />
+                      {sideIndex === 2 && images.length > 4 ? (
+                        <span className={styles.morePhotos}>+{images.length - 4} фото</span>
+                      ) : null}
+                    </button>
+                  )
+                }) : (
+                  <>
+                    <div className={styles.thumbButton} />
+                    <div className={styles.thumbButton} />
+                    <div className={styles.thumbButton} />
+                  </>
+                )}
+              </div>
+            </div>
+
+            {images.length > 1 ? (
+              <div className={styles.mobileThumbs}>
+                {images.map((url, index) => (
+                  <button type="button" key={url} onClick={() => setActiveImage(index)}>
+                    <img src={url} alt={`${project.name} — фото ${index + 1}`} />
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <div className={styles.gallery}>
+            <div className={styles.mainImageButton}>
+              <ProjectImage project={project} className={styles.mainImage} />
+              <div className={styles.badges}>
+                <span>{getConstructionStatusLabel(project)}</span>
+                {project.badge ? <span>{project.badge}</span> : null}
+              </div>
+            </div>
+            <div className={styles.thumbRail}>
+              <div className={styles.thumbButton} />
+              <div className={styles.thumbButton} />
+              <div className={styles.thumbButton} />
+            </div>
+          </div>
+        )}
+
+        <div className={styles.heroMeta}>
+          <div className={styles.heroCopy}>
+            <p className={styles.partner}>{partner?.name ?? 'Партнер Ailat'}</p>
+            <h1>{project.name}</h1>
+            <p className={styles.address}>{formatProjectAddress(project)}</p>
+          </div>
+
+          <div className={styles.priceBlock}>
+            <span>Стоимость от</span>
+            <strong>{formatProjectPrice(project)}</strong>
+          </div>
         </div>
       </section>
 
-      <section className="apple-container project-detail-content">
-        <div className="project-detail-grid">
-          <div className="project-detail-main">
-            <h2>О проекте</h2>
-            <p>{project.description}</p>
+      <section className={styles.quickFacts}>
+        <div><span>Город</span><strong>{project.city}</strong></div>
+        <div><span>Срок сдачи</span><strong>{project.completion || '—'}</strong></div>
+        {area ? <div><span>Площадь</span><strong>{area}</strong></div> : null}
+        <div><span>Статус</span><strong>{getConstructionStatusLabel(project)}</strong></div>
+      </section>
 
-            {highlights.length ? (
-              <div className="project-detail-highlights">
-                <h3>Преимущества</h3>
-                <ul>
-                  {highlights.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
+      <section className={styles.contentGrid}>
+        <div className={styles.content}>
+          <div className={styles.sectionIntro}>
+            <span>О проекте</span>
+            <h2>{project.name}</h2>
           </div>
 
-          <aside className="project-detail-sidebar">
-            <div className="project-detail-facts">
-              <div><span>Застройщик</span><strong>{partner?.name ?? 'Партнер Ailat'}</strong></div>
-              <div><span>Город</span><strong>{project.city}</strong></div>
-              <div><span>Адрес</span><strong>{formatProjectAddress(project)}</strong></div>
-              <div><span>Стоимость</span><strong>{formatProjectPrice(project)}</strong></div>
-              {area ? <div><span>Площадь</span><strong>{area}</strong></div> : null}
-              <div><span>Срок сдачи</span><strong>{project.completion}</strong></div>
-              <div><span>Статус</span><strong>{getConstructionStatusLabel(project)}</strong></div>
-            </div>
+          <p className={styles.description}>
+            {project.description || 'Информация о жилом комплексе скоро появится.'}
+          </p>
 
-            <div className="project-detail-payment">
-              <span>Платеж от</span>
-              <strong>{formatKzt(payment.monthlyPayment)}</strong>
-              <small>в месяц · {Math.max(...product.terms)} мес.</small>
+          {highlights.length ? (
+            <div className={styles.highlights}>
+              <h3>Преимущества</h3>
+              <div className={styles.highlightsGrid}>
+                {highlights.map((item) => (
+                  <div className={styles.highlight} key={item}>
+                    <span>✓</span><p>{item}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-
-            <Link className="apple-pill apple-pill-full" href={calcHref}>Рассчитать финансирование</Link>
-            <Link className="apple-pill apple-pill-full project-detail-apply" href={applyHref}>Получить предварительное решение</Link>
-            <Link className="catalog-link-btn project-detail-back" href="/#projects">← Все жилые комплексы</Link>
-          </aside>
+          ) : null}
         </div>
+
+        <aside className={styles.financeCard}>
+          <div className={styles.financeHeading}>
+            <span>Финансирование Ailat</span>
+            <h3>Условия для этого проекта</h3>
+          </div>
+
+          <div className={styles.payment}>
+            <span>Ориентировочный платеж от</span>
+            <strong>{formatKzt(payment.monthlyPayment)}</strong>
+            <small>в месяц · {Math.max(...product.terms)} мес.</small>
+          </div>
+
+          <div className={styles.financeFacts}>
+            <div><span>Стоимость</span><strong>{formatProjectPrice(project)}</strong></div>
+            <div><span>Первоначальный взнос</span><strong>от {product.minDownPaymentPercent}%</strong></div>
+            <div><span>Максимальный срок</span><strong>{Math.max(...product.terms)} мес.</strong></div>
+          </div>
+
+          <Link className={styles.primaryCta} href={calcHref}>Рассчитать финансирование</Link>
+          <Link className={styles.secondaryCta} href={applyHref}>Получить предварительное решение</Link>
+
+          <p className={styles.disclaimer}>
+            Расчет предварительный и не является офертой или окончательным решением о предоставлении финансирования.
+          </p>
+        </aside>
+      </section>
+
+      <section className={styles.finalCta}>
+        <div>
+          <span>Ailat Finance</span>
+          <h2>Выбрали квартиру?<br/>Рассчитайте финансирование.</h2>
+        </div>
+        <Link className={styles.finalButton} href={applyHref}>Получить решение</Link>
       </section>
     </main>
   )

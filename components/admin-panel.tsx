@@ -26,6 +26,7 @@ export default function AdminPanel() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [uploadingProjectId, setUploadingProjectId] = useState<string | null>(null)
+  const [uploadingGalleryProjectId, setUploadingGalleryProjectId] = useState<string | null>(null)
   const [uploadErrors, setUploadErrors] = useState<Record<string, string>>({})
 
   const load = async () => {
@@ -75,26 +76,22 @@ export default function AdminPanel() {
     }],
   }))
 
+  const uploadFile = async (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await fetch('/api/uploads/projects', { method: 'POST', body: formData })
+    const data = await response.json()
+    if (!response.ok) throw new Error(data.error || 'Ошибка загрузки изображения')
+    return data.url as string
+  }
+
   const uploadProjectCover = async (projectId: string, file: File) => {
     setUploadingProjectId(projectId)
     setUploadErrors((current) => ({ ...current, [projectId]: '' }))
 
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const response = await fetch('/api/uploads/projects', {
-        method: 'POST',
-        body: formData,
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Ошибка загрузки изображения')
-      }
-
-      updateProject(projectId, { coverImageUrl: data.url }, setContent)
+      const url = await uploadFile(file)
+      updateProject(projectId, { coverImageUrl: url }, setContent)
     } catch (error) {
       setUploadErrors((current) => ({
         ...current,
@@ -103,6 +100,47 @@ export default function AdminPanel() {
     } finally {
       setUploadingProjectId(null)
     }
+  }
+
+  const uploadProjectGallery = async (projectId: string, files: File[]) => {
+    if (!files.length) return
+
+    setUploadingGalleryProjectId(projectId)
+    setUploadErrors((current) => ({ ...current, [projectId]: '' }))
+
+    try {
+      const urls: string[] = []
+      for (const file of files.slice(0, 10)) {
+        urls.push(await uploadFile(file))
+      }
+
+      setContent((current) => ({
+        ...current,
+        projects: current.projects.map((project) =>
+          project.id === projectId
+            ? { ...project, gallery: [...(project.gallery || []), ...urls] }
+            : project
+        ),
+      }))
+    } catch (error) {
+      setUploadErrors((current) => ({
+        ...current,
+        [projectId]: error instanceof Error ? error.message : 'Ошибка загрузки галереи',
+      }))
+    } finally {
+      setUploadingGalleryProjectId(null)
+    }
+  }
+
+  const removeGalleryImage = (projectId: string, url: string) => {
+    setContent((current) => ({
+      ...current,
+      projects: current.projects.map((project) =>
+        project.id === projectId
+          ? { ...project, gallery: (project.gallery || []).filter((item) => item !== url) }
+          : project
+      ),
+    }))
   }
 
   const setStatus = async (id: string, status: Application['status']) => {
@@ -137,7 +175,7 @@ export default function AdminPanel() {
         </nav>
         <div className="admin-side-footer">
           <a href="/" target="_blank">Открыть сайт <span>↗</span></a>
-          <small>Ailat Mortgage CMS · v1.2</small>
+          <small>Ailat Mortgage CMS · v1.3</small>
         </div>
       </aside>
 
@@ -239,34 +277,17 @@ export default function AdminPanel() {
                   <div className={uploadStyles.imageManager}>
                     <div className={uploadStyles.cover}>
                       {project.coverImageUrl?.trim() ? (
-                        <img
-                          className={uploadStyles.coverImage}
-                          src={project.coverImageUrl}
-                          alt={project.name}
-                        />
+                        <img className={uploadStyles.coverImage} src={project.coverImageUrl} alt={project.name} />
                       ) : (
-                        <div className={uploadStyles.placeholder}>
-                          <span>Фото отсутствует</span>
-                        </div>
+                        <div className={uploadStyles.placeholder}><span>Фото отсутствует</span></div>
                       )}
 
-                      {project.badge ? (
-                        <span className={uploadStyles.badge}>{project.badge}</span>
-                      ) : null}
+                      {project.badge ? <span className={uploadStyles.badge}>{project.badge}</span> : null}
                     </div>
 
                     <div className={uploadStyles.actions}>
-                      <label
-                        className={`${uploadStyles.uploadButton} ${
-                          uploadingProjectId === project.id ? uploadStyles.uploadButtonDisabled : ''
-                        }`}
-                      >
-                        {uploadingProjectId === project.id
-                          ? 'Загрузка...'
-                          : project.coverImageUrl
-                            ? 'Заменить фото'
-                            : 'Загрузить фото'}
-
+                      <label className={`${uploadStyles.uploadButton} ${uploadingProjectId === project.id ? uploadStyles.uploadButtonDisabled : ''}`}>
+                        {uploadingProjectId === project.id ? 'Загрузка...' : project.coverImageUrl ? 'Заменить обложку' : 'Загрузить обложку'}
                         <input
                           className={uploadStyles.fileInput}
                           type="file"
@@ -281,23 +302,61 @@ export default function AdminPanel() {
                       </label>
 
                       {project.coverImageUrl ? (
-                        <button
-                          type="button"
-                          className={uploadStyles.removeButton}
-                          onClick={() => updateProject(project.id, { coverImageUrl: '' }, setContent)}
-                        >
+                        <button type="button" className={uploadStyles.removeButton} onClick={() => updateProject(project.id, { coverImageUrl: '' }, setContent)}>
                           Удалить
                         </button>
                       ) : null}
 
-                      <small className={uploadStyles.hint}>
-                        JPG, PNG или WebP · до 5 МБ · рекомендуется 16:9
-                      </small>
+                      <small className={uploadStyles.hint}>Обложка · JPG, PNG или WebP · до 5 МБ</small>
                     </div>
 
-                    {uploadErrors[project.id] ? (
-                      <div className={uploadStyles.error}>{uploadErrors[project.id]}</div>
-                    ) : null}
+                    <div className={uploadStyles.galleryBlock}>
+                      <div className={uploadStyles.galleryHeader}>
+                        <strong>Галерея ЖК</strong>
+                        <span>{(project.gallery || []).length} фото</span>
+                      </div>
+
+                      {(project.gallery || []).length ? (
+                        <div className={uploadStyles.galleryGrid}>
+                          {(project.gallery || []).map((url) => (
+                            <div className={uploadStyles.galleryItem} key={url}>
+                              <img src={url} alt={project.name} />
+                              <button
+                                type="button"
+                                className={uploadStyles.galleryDelete}
+                                onClick={() => removeGalleryImage(project.id, url)}
+                                aria-label="Удалить фотографию"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className={uploadStyles.galleryEmpty}>Дополнительные фотографии еще не загружены</div>
+                      )}
+
+                      <div className={uploadStyles.actions}>
+                        <label className={`${uploadStyles.uploadButton} ${uploadingGalleryProjectId === project.id ? uploadStyles.uploadButtonDisabled : ''}`}>
+                          {uploadingGalleryProjectId === project.id ? 'Загрузка галереи...' : '+ Добавить фотографии'}
+                          <input
+                            className={uploadStyles.fileInput}
+                            type="file"
+                            multiple
+                            accept="image/jpeg,image/png,image/webp"
+                            disabled={uploadingGalleryProjectId === project.id}
+                            onChange={(event) => {
+                              const files = Array.from(event.target.files || [])
+                              if (files.length) uploadProjectGallery(project.id, files)
+                              event.target.value = ''
+                            }}
+                          />
+                        </label>
+                        <small className={uploadStyles.hint}>Можно выбрать несколько файлов одновременно · максимум 10 за загрузку</small>
+                      </div>
+                    </div>
+
+                    {uploadErrors[project.id] ? <div className={uploadStyles.error}>{uploadErrors[project.id]}</div> : null}
                   </div>
 
                   <div className="admin-project-form">

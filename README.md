@@ -1,24 +1,25 @@
-# Ailat Mortgage Platform v1.2
+# Project Detail v2
 
-Digital mortgage storefront + admin panel for Ailat Finance.
+Скопируйте два файла в текущую папку `components/`:
 
-## Routes
-- `/` — client mortgage storefront
-- `/admin` — product/content/application administration
+- `project-detail-view.tsx`
+- `project-detail-view.module.css`
 
-## Local run
+Это изолированный CSS-module. Старые `project-detail-*` стили в `app/globals.css` можно пока не удалять — новая страница их не использует.
+
+После копирования:
+
 ```bash
-npm install
+npm run build
 npm run dev
 ```
-Open `http://localhost:3000` and `http://localhost:3000/admin`.
 
-## v1.2
-- completely redesigned Apple-inspired public UI
-- new light product dashboard/admin UI
-- mortgage calculator preserved and restyled
-- partners/projects/applications remain linked to `data/store.json`
-- product settings continue to control the client calculator
+Откройте любую карточку ЖК → `Подробнее`.
 
-## Important
-The payment formula is still a UX/demo model and must be replaced by the approved product methodology before production.
+Если результат устраивает:
+
+```bash
+git add .
+git commit -m "feat: redesign project detail page v2"
+git push
+```
