@@ -178,6 +178,29 @@
       "createdAt": "2026-08-12T10:32:50.000Z",
       "status": "approved",
       "updatedAt": "2026-08-12T10:33:12.142Z"
+    },
+    {
+      "iin": "900900900900",
+      "phone": "777755566556",
+      "selectedProjectId": "greenline",
+      "source": "project",
+      "propertyPrice": 32500000,
+      "minDownPayment": 6500000,
+      "downPayment": 6500000,
+      "downPaymentPercent": 20,
+      "financingAmount": 26000000,
+      "termMonths": 60,
+      "monthlyPayment": 823333,
+      "totalRepayment": 49400000,
+      "eligible": true,
+      "eligibilityReason": null,
+      "consentAccepted": true,
+      "consentVersion": "2026-08-11-v1",
+      "consentAcceptedAt": "2026-08-13T07:29:42.522Z",
+      "id": "APP-1786606182577",
+      "createdAt": "2026-08-13T07:29:42.577Z",
+      "status": "approved",
+      "updatedAt": "2026-08-13T07:29:59.854Z"
     }
   ]
 }

@@ -12,7 +12,7 @@ import type {
 import { DEFAULT_PRODUCT, formatKzt } from '@/lib/mortgage'
 import uploadStyles from './admin-project-upload.module.css'
 
-type Tab = 'overview' | 'product' | 'partners' | 'projects' | 'applications'
+type Tab = 'overview' | 'product' | 'partners' | 'projects' | 'applications' | 'account'
 type Content = { product: ProductConfig; partners: Partner[]; projects: PropertyProject[] }
 
 const uid = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
@@ -24,42 +24,173 @@ const navItems: { id: Tab; label: string; icon: string }[] = [
   { id: 'partners', label: 'Партнеры', icon: '◇' },
   { id: 'projects', label: 'Жилые комплексы', icon: '▦' },
   { id: 'applications', label: 'Заявки', icon: '◎' },
+  { id: 'account', label: 'Аккаунт', icon: '⚙' },
 ]
 
 export default function AdminPanel() {
+
   const [tab, setTab] = useState<Tab>('overview')
-  const [content, setContent] = useState<Content>({ product: DEFAULT_PRODUCT, partners: [], projects: [] })
+
+  const [content, setContent] = useState<Content>({
+
+    product: DEFAULT_PRODUCT,
+
+    partners: [],
+
+    projects: [],
+
+  })
+
+  const [termsInput, setTermsInput] = useState(DEFAULT_PRODUCT.terms.join(', '))
+
   const [apps, setApps] = useState<Application[]>([])
+
   const [saving, setSaving] = useState(false)
+
   const [saved, setSaved] = useState(false)
+  
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+const [confirmPassword, setConfirmPassword] = useState('')
+const [passwordMessage, setPasswordMessage] = useState('')
+const [passwordError, setPasswordError] = useState('')
+const [passwordSaving, setPasswordSaving] = useState(false)
+
   const [uploadingProjectId, setUploadingProjectId] = useState<string | null>(null)
+
   const [uploadingGalleryProjectId, setUploadingGalleryProjectId] = useState<string | null>(null)
+
   const [uploadErrors, setUploadErrors] = useState<Record<string, string>>({})
 
   const load = async () => {
+
     const [c, a] = await Promise.all([
+
       fetch('/api/content', { cache: 'no-store' }).then((r) => r.json()),
+
       fetch('/api/applications', { cache: 'no-store' }).then((r) => r.json()),
+
     ])
+
     setContent(c)
+
+    setTermsInput(c.product.terms.join(', '))
+
     setApps(a)
+
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+
+    load()
+
+  }, [])
 
   const save = async () => {
+
     setSaving(true)
+
     setSaved(false)
 
     await fetch('/api/content', {
+
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+
+      headers: {
+
+        'Content-Type': 'application/json',
+
+      },
+
       body: JSON.stringify(content),
+
     })
 
     setSaving(false)
+
     setSaved(true)
-    setTimeout(() => setSaved(false), 1800)
+
+    setTimeout(() => {
+
+      setSaved(false)
+
+    }, 1800)
+
+  }
+
+  const logout = async () => {
+
+    const response = await fetch('/api/auth/logout', {
+
+      method: 'POST',
+
+    })
+
+    if (response.ok) {
+
+      window.location.href = '/admin/login'
+
+    }
+
+  }
+  const changePassword = async () => {
+    setPasswordError('')
+    setPasswordMessage('')
+  
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordError('Заполните все поля')
+      return
+    }
+  
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Новые пароли не совпадают')
+      return
+    }
+  
+    if (newPassword.length < 8) {
+      setPasswordError('Новый пароль должен содержать минимум 8 символов')
+      return
+    }
+  
+    setPasswordSaving(true)
+  
+    try {
+      const response = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+        }),
+      })
+  
+      const data = await response.json()
+  
+      if (!response.ok) {
+        setPasswordError(data.error || 'Не удалось изменить пароль')
+        return
+      }
+  
+      setPasswordMessage('Пароль успешно изменен')
+  
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+  
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      })
+  
+      setTimeout(() => {
+        window.location.href = '/admin/login'
+      }, 1200)
+    } catch {
+      setPasswordError('Не удалось изменить пароль')
+    } finally {
+      setPasswordSaving(false)
+    }
   }
 
   const activeProjects = content.projects.filter((p) => p.active).length
@@ -325,6 +456,7 @@ export default function AdminPanel() {
     partners: 'Партнеры',
     projects: 'Жилые комплексы',
     applications: 'Заявки',
+    account: 'Аккаунт',
   }[tab]
 
   return (
@@ -352,9 +484,20 @@ export default function AdminPanel() {
         </nav>
 
         <div className="admin-side-footer">
-          <a href="/" target="_blank">Открыть сайт <span>↗</span></a>
-          <small>Ailat Mortgage CMS · v1.4</small>
-        </div>
+  <a href="/" target="_blank" rel="noreferrer">
+    Открыть сайт <span>↗</span>
+  </a>
+
+  <button
+    type="button"
+    onClick={logout}
+    className="admin-logout-button"
+  >
+    Выйти
+  </button>
+
+  <small>Ailat Mortgage CMS · v1.4</small>
+</div>
       </aside>
 
       <main className="apple-admin-main">
@@ -445,18 +588,25 @@ export default function AdminPanel() {
                 </div>
 
                 <Field
-                  label="Сроки финансирования, мес. (через запятую)"
-                  value={content.product.terms.join(', ')}
-                  onChange={(v) =>
-                    setContent((c) => ({
-                      ...c,
-                      product: {
-                        ...c.product,
-                        terms: v.split(',').map((x) => Number(x.trim())).filter(Boolean),
-                      },
-                    }))
-                  }
-                />
+  label="Сроки финансирования, мес. (через запятую)"
+  value={termsInput}
+  onChange={(v) => {
+    setTermsInput(v)
+
+    const terms = v
+      .split(',')
+      .map((x) => Number(x.trim()))
+      .filter((x) => Number.isFinite(x) && x > 0)
+
+    setContent((c) => ({
+      ...c,
+      product: {
+        ...c.product,
+        terms,
+      },
+    }))
+  }}
+/>
 
                 <div className="admin-info-box">
                   <span>i</span>
@@ -898,22 +1048,91 @@ export default function AdminPanel() {
           </section>
         )}
 
-        {tab === 'applications' && (
-          <section className="admin-view">
-            <div className="admin-list-toolbar">
-              <div>
-                <h2>Входящие заявки</h2>
-                <p>Предварительные заявки с клиентской витрины.</p>
-              </div>
+{tab === 'applications' && (
+  <section className="admin-view">
+    <div className="admin-list-toolbar">
+      <div>
+        <h2>Входящие заявки</h2>
+        <p>Предварительные заявки с клиентской витрины.</p>
+      </div>
 
-              <button className="admin-secondary-button" onClick={load}>↻ Обновить</button>
-            </div>
+      <button className="admin-secondary-button" onClick={load}>
+        ↻ Обновить
+      </button>
+    </div>
 
-            <div className="admin-panel admin-table-panel">
-              <ApplicationTable apps={apps} projects={content.projects} onStatus={setStatus}/>
-            </div>
-          </section>
-        )}
+    <div className="admin-panel admin-table-panel">
+      <ApplicationTable
+        apps={apps}
+        projects={content.projects}
+        onStatus={setStatus}
+      />
+    </div>
+  </section>
+)}
+
+{tab === 'account' && (
+  <section className="admin-view">
+    <div
+      className="admin-panel admin-form-panel"
+      style={{ maxWidth: 620 }}
+    >
+      <PanelHead
+        eyebrow="Безопасность"
+        title="Учетная запись администратора"
+        subtitle="Измените пароль для доступа к панели управления."
+      />
+
+      <div className="admin-form-body">
+        <label className="admin-field-new">
+          <span>Пользователь</span>
+          <input value="admin" readOnly />
+        </label>
+
+        <PasswordField
+          label="Текущий пароль"
+          value={currentPassword}
+          onChange={setCurrentPassword}
+        />
+
+        <PasswordField
+          label="Новый пароль"
+          value={newPassword}
+          onChange={setNewPassword}
+        />
+
+        <PasswordField
+          label="Повторите новый пароль"
+          value={confirmPassword}
+          onChange={setConfirmPassword}
+        />
+
+        {passwordError ? (
+          <div className="admin-password-error">
+            {passwordError}
+          </div>
+        ) : null}
+
+        {passwordMessage ? (
+          <div className="admin-password-success">
+            {passwordMessage}
+          </div>
+        ) : null}
+
+        <button
+          type="button"
+          className="admin-primary-button"
+          onClick={changePassword}
+          disabled={passwordSaving}
+          style={{ marginTop: 20 }}
+        >
+          {passwordSaving ? 'Изменение...' : 'Изменить пароль'}
+        </button>
+      </div>
+    </div>
+  </section>
+)}
+
       </main>
     </div>
   )
@@ -1003,7 +1222,31 @@ function Field({
   return (
     <label className="admin-field-new">
       <span>{label}</span>
-      <input value={value} onChange={(e) => onChange(e.target.value)}/>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </label>
+  )
+}
+function PasswordField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: string
+  onChange: (v: string) => void
+}) {
+  return (
+    <label className="admin-field-new">
+      <span>{label}</span>
+      <input
+        type="password"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        autoComplete="new-password"
+      />
     </label>
   )
 }

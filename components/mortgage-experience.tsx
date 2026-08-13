@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import PartnersSection from '@/components/partners-section'
 import ProjectsCatalog from '@/components/projects-catalog'
@@ -16,9 +17,18 @@ const formatInputNumber = (value: number) => value.toLocaleString('ru-RU')
 
 function AilatLogo({ dark = true }: { dark?: boolean }) {
   return (
-    <a className={`apple-brand ${dark ? '' : 'apple-brand-light'}`} href="#top" aria-label="Ailat Finance">
-      <span className="apple-brand-mark">a</span>
-      <span>ailat<span className="apple-brand-dot">.</span></span>
+    <a
+      className={`ailat-logo ${dark ? '' : 'ailat-logo-light'}`}
+      href="#top"
+      aria-label="Ailat Finance"
+    >
+      <Image
+        src={dark ? '/ailat-logo.png' : '/ailat-logo-white.png'}
+        alt="Ailat Finance"
+        width={120}
+        height={48}
+        priority
+      />
     </a>
   )
 }
@@ -275,7 +285,7 @@ export default function MortgageExperience() {
       <section className="apple-trust-block">
         <div className="apple-container apple-trust-grid">
           <div className="apple-trust-item">
-            <strong>Лицензия AFSA</strong>
+            <strong>Лицензия AFSA № AFSA-A-LA-2026-0004</strong>
             <span>Регулируемая финансовая деятельность</span>
           </div>
           <div className="apple-trust-item">
@@ -487,37 +497,159 @@ export default function MortgageExperience() {
         onCalculate={chooseProject}
       />
 
-      <section id="how-it-works" className="apple-how-section">
-        <div className="apple-container">
-          <div className="apple-section-intro apple-centered apple-how-intro">
-            <span className="apple-section-label">Как это работает</span>
-            <h2>Четыре шага до решения</h2>
-          </div>
-          <div className="apple-how-grid">
-            <div><span>1</span><h3>Выберите объект</h3><p>Из каталога партнеров или укажите стоимость самостоятельно</p></div>
-            <div><span>2</span><h3>Настройте расчет</h3><p>Выберите первоначальный взнос и подходящий срок финансирования</p></div>
-            <div><span>3</span><h3>Оставьте контакты</h3><p>ИИН, номер телефона и согласие на обработку персональных данных</p></div>
-            <div><span>4</span><h3>Получите обратную связь</h3><p>Менеджер Ailat свяжется с вами по предварительной заявке</p></div>
-          </div>
+<section id="how-it-works" className="apple-how-section">
+  <div className="apple-container">
+
+    <div className="apple-how-intro-new">
+      <span className="apple-section-label">Как это работает</span>
+      <h2>Четыре шага до решения</h2>
+      <p>
+        Выберите недвижимость, настройте условия финансирования
+        и отправьте предварительную заявку онлайн
+      </p>
+    </div>
+
+    <div className="apple-how-grid-new">
+
+      <div className="apple-how-card-new">
+        <div className="apple-how-number">01</div>
+
+        <div className="apple-how-content-new">
+          <h3>Выберите объект</h3>
+          <p>
+          Выберите ЖК из каталога партнеров 
+          или укажите стоимость самостоятельно
+          </p>
         </div>
-      </section>
+      </div>
+
+      <div className="apple-how-card-new">
+        <div className="apple-how-number">02</div>
+
+        <div className="apple-how-content-new">
+          <h3>Рассчитайте условия</h3>
+          <p>
+            Укажите первоначальный взнос и выберите
+            подходящий срок финансирования
+          </p>
+        </div>
+      </div>
+
+      <div className="apple-how-card-new">
+        <div className="apple-how-number">03</div>
+
+        <div className="apple-how-content-new">
+          <h3>Отправьте заявку</h3>
+          <p>
+            Укажите ИИН и номер телефона и подтвердите
+            согласие на обработку персональных данных
+          </p>
+        </div>
+      </div>
+
+      <div className="apple-how-card-new apple-how-card-final">
+        <div className="apple-how-number">04</div>
+
+        <div className="apple-how-content-new">
+          <h3>Получите решение</h3>
+          <p>
+            Получите предварительное решение
+            Менеджер Ailat свяжется с вами для дальнейших шагов
+          </p>
+        </div>
+
+        <a href="#calculator" className="apple-how-arrow" aria-label="Перейти к расчету">
+          →
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
 
       <section className="apple-final-cta">
         <div className="apple-container apple-final-inner">
-          <span className="apple-section-label">Ailat Mortgage</span>
-          <h2>Начните с расчета<br/>Остальное — проще</h2>
+          <span className="apple-section-label">Ailat Finance</span>
+          <h2>Начните с расчета<br/>Получите решение онлайн</h2>
           <a className="apple-pill apple-pill-large" href="#calculator">Рассчитать финансирование</a>
         </div>
       </section>
 
       <footer className="apple-footer">
-        <div className="apple-container apple-footer-grid">
-          <div><AilatLogo dark={false}/><p>Цифровая витрина исламского финансирования недвижимости</p></div>
-          <div><strong>Продукт</strong><a href="#mortgage">Ипотека</a><a href="#calculator">Калькулятор</a><a href="#projects">Жилые комплексы</a><a href="#how-it-works">Как это работает</a></div>
-          <div><strong>Компания</strong><a href="https://ailat.kz" target="_blank" rel="noreferrer">Ailat Finance ↗</a><a href="/admin">Администрирование</a></div>
-        </div>
-        <div className="apple-container apple-footer-bottom"><span>© 2026 Ailat Finance</span><span>Предварительная версия продукта</span></div>
-      </footer>
+  <div className="apple-container apple-footer-grid">
+
+    <div className="apple-footer-brand">
+      <AilatLogo dark={false} />
+      <p>
+        Цифровая витрина исламского финансирования недвижимости
+      </p>
+    </div>
+
+    <div className="apple-footer-column">
+      <strong>Продукт</strong>
+      <a href="#mortgage">Ипотека</a>
+      <a href="#calculator">Калькулятор</a>
+      <a href="#projects">Жилые комплексы</a>
+      <a href="#how-it-works">Как это работает</a>
+    </div>
+
+    <div className="apple-footer-column">
+      <strong>Компания</strong>
+
+      <a
+        href="https://ailat.kz"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Ailat Finance ↗
+      </a>
+
+      <a href="#">
+        Политика конфиденциальности
+      </a>
+
+      <a href="#">
+        Пользовательское соглашение
+      </a>
+    </div>
+
+    <div className="apple-footer-column apple-footer-contacts">
+      <strong>Контакты</strong>
+
+      <a href="tel:+77000484648">
+        +7 700 048 46 48
+      </a>
+
+      <a href="mailto:admin@ailat.kz">
+        admin@ailat.kz
+      </a>
+
+      <span>
+        Республика Казахстан<br />
+        город Астана
+      </span>
+    </div>
+
+  </div>
+
+  <div className="apple-container apple-footer-bottom">
+
+    <span>© 2026 Ailat Finance</span>
+
+    <div className="apple-footer-bottom-links">
+      <a
+        href="#"
+        className="apple-footer-license"
+        title="Лицензия AFSA"
+      >
+        Лицензия AFSA № AFSA-A-LA-2025-0006 ↗
+      </a>
+
+      <span>Предварительная версия продукта</span>
+    </div>
+
+  </div>
+</footer>
 
       {modalOpen && (
         <div className="apple-modal-backdrop" onMouseDown={() => setModalOpen(false)}>
