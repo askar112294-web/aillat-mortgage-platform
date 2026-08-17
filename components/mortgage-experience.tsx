@@ -284,10 +284,16 @@ export default function MortgageExperience() {
 
       <section className="apple-trust-block">
         <div className="apple-container apple-trust-grid">
-          <div className="apple-trust-item">
-            <strong>Лицензия AFSA № AFSA-A-LA-2026-0004</strong>
-            <span>Регулируемая финансовая деятельность</span>
-          </div>
+         <a
+  className="apple-trust-item"
+  href="https://drive.google.com/file/d/1LgB76nTigLaZFT6pNRgLqN7aFvdwfVVf/view?usp=drive_link"
+  target="_blank"
+  rel="noopener noreferrer"
+  title="Открыть лицензию AFSA"
+>
+  <strong>Лицензия AFSA № AFSA-A-LA-2026-0004</strong>
+  <span>Регулируемая финансовая деятельность</span>
+</a>
           <div className="apple-trust-item">
             <strong>Исламское финансирование</strong>
             <span>Прозрачная структура сделки</span>
@@ -638,14 +644,14 @@ export default function MortgageExperience() {
 
     <div className="apple-footer-bottom-links">
       <a
-        href="#"
+        href="https://drive.google.com/file/d/1LgB76nTigLaZFT6pNRgLqN7aFvdwfVVf/view?usp=drive_link"
+        target="_blank"
+        rel="noopener noreferrer"
         className="apple-footer-license"
         title="Лицензия AFSA"
       >
-        Лицензия AFSA № AFSA-A-LA-2025-0006 ↗
+        Лицензия AFSA № AFSA-A-LA-2026-0004 ↗
       </a>
-
-      <span>Предварительная версия продукта</span>
     </div>
 
   </div>
